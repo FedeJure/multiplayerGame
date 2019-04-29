@@ -2,17 +2,17 @@ class MainScene extends Phaser.Scene {
   constructor() {
     super({ key: "MainGame", active: true });
     this.playAnimations = {
-      idle: (player,info) => {
+      idle: (player, info) => {
         if (player.anims.currentAnim.key == "idle") return;
         player.scaleX = info.side;
         player.anims.play("idle");
       },
-      walk: (player,info) => {
+      walk: (player, info) => {
         if (player.anims.currentAnim.key == "walk") return;
         player.scaleX = info.side;
         player.anims.play("walk");
       },
-      jump: (player,info) => {
+      jump: (player, info) => {
         if (player.anims.currentAnim.key == "jump") return;
         player.scaleX = info.side;
         player.anims.play("jump");
@@ -27,8 +27,13 @@ class MainScene extends Phaser.Scene {
       .setDisplaySize(53, 40);
     player.playerId = playerInfo.playerId;
     player.anims.play("idle");
-
+    console.log(player);
+    player.name = this.add.text(0, 0, "Nombre", {
+      fontFamily: '"Roboto Condensed"'
+    });
+    this.updatePlayerName(player, playerInfo);
     this.players.add(player);
+    return player;
   }
 
   preload() {
@@ -74,7 +79,10 @@ class MainScene extends Phaser.Scene {
     this.socket.on("currentPlayers", players => {
       Object.keys(players).forEach(id => {
         if (players[id].playerId === this.socket.id) {
-          this.displayPlayers(players[id], "player");
+          this.cameras.main.setBounds(0, 0);
+          this.cameras.main.startFollow(
+            this.displayPlayers(players[id], "player")
+          );
         } else {
           this.displayPlayers(players[id], "player"); //para cargar jugadores distintos al local.
         }
@@ -97,9 +105,10 @@ class MainScene extends Phaser.Scene {
       Object.keys(players).forEach(id => {
         this.players.getChildren().forEach(player => {
           if (players[id].playerId === player.playerId) {
-            this.playAnimations[players[id].anim](player,players[id]);
+            this.playAnimations[players[id].anim](player, players[id]);
             player.setRotation(players[id].rotation);
             player.setPosition(players[id].x, players[id].y);
+            this.updatePlayerName(player, players[id]);
           }
         });
       });
@@ -112,6 +121,13 @@ class MainScene extends Phaser.Scene {
 
     this.createTerrain();
     this.initPlatforms();
+  }
+
+  updatePlayerName(player, playerInfo) {
+    player.name.setPosition(
+      playerInfo.x - player.width / 2,
+      playerInfo.y - player.height
+    );
   }
 
   checkAnimations(playerInfo, player) {

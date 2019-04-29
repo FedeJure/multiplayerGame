@@ -150,17 +150,17 @@ class GameScene extends Phaser.Scene {
       lastPlatformX += config.width * 0.5;
     }
     this.physics.add.collider(Phaser.GameObjects.Rectangle);
-    this.platforms.addMultiple([
-      new Phaser.GameObjects.Rectangle(
-        this,
-        lastPlatformX,
-        platformY,
-        10,
-        1000,
-        0,
-        100
-      ),
-      new Phaser.GameObjects.Rectangle(this, 60, platformY, 10, 1000, 0, 10)
-    ]);
+    // this.platforms.addMultiple([
+    //   new Phaser.GameObjects.Rectangle(
+    //     this,
+    //     lastPlatformX,
+    //     platformY,
+    //     10,
+    //     1000,
+    //     0,
+    //     100
+    //   ),
+    //   new Phaser.GameObjects.Rectangle(this, 60, platformY, 10, 1000, 0, 10)
+    // ]);
   }
 }
