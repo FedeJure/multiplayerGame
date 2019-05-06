@@ -2,20 +2,31 @@ class MainScene extends Phaser.Scene {
   constructor() {
     super({ key: "MainGame", active: true });
     this.playAnimations = {
-      idle: (player,info) => {
+      idle: (player, info) => {
         if (player.anims.currentAnim.key == "idle") return;
         player.scaleX = info.side;
         player.anims.play("idle");
       },
-      walk: (player,info) => {
-        if (player.anims.currentAnim.key == "walk") return;
+      walk: (player, info) => {
+        if (
+          player.anims.currentAnim.key == "walk" &&
+          player.scaleX == info.side
+        )
+          return;
         player.scaleX = info.side;
         player.anims.play("walk");
       },
-      jump: (player,info) => {
+      jump: (player, info) => {
         if (player.anims.currentAnim.key == "jump") return;
         player.scaleX = info.side;
         player.anims.play("jump");
+      },
+      attack1: (player, info) => {
+        if (player.anims.currentAnim.key == "attack1") return;
+        player.canAnimate = false;
+        console.log(player)
+        player.scaleX = info.side;
+        player.anims.play("attack1");
       }
     };
   }
@@ -27,8 +38,16 @@ class MainScene extends Phaser.Scene {
       .setDisplaySize(53, 40);
     player.playerId = playerInfo.playerId;
     player.anims.play("idle");
-
+    player.name = this.add.text(0, 0, "Nombre", {
+      fontFamily: '"Roboto Condensed"'
+    });
+    this.updatePlayerName(player, playerInfo);
+    player.canAnimate = true;
+    player.on("animationcomplete", key => {
+      if (!player.canAnimate) player.canAnimate = true;
+    });
     this.players.add(player);
+    return player;
   }
 
   preload() {
@@ -43,38 +62,27 @@ class MainScene extends Phaser.Scene {
       down: "S",
       left: "A",
       right: "D",
-      jump: "SPACE"
+      jump: "SPACE",
+      attack1: "U",
+      attack2: "I",
+      attack3: "O"
     });
   }
 
   create() {
     this.socket = io();
     this.players = this.add.group();
+    this.cameras.main.setBackgroundColor("#ccccff");
 
-    this.anims.create({
-      key: "walk",
-      frames: this.anims.generateFrameNumbers("player", { start: 8, end: 13 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    this.anims.create({
-      key: "idle",
-      frames: this.anims.generateFrameNumbers("player", { start: 0, end: 2 }),
-      frameRate: 5,
-      repeat: -1
-    });
-    this.anims.create({
-      key: "jump",
-      frames: this.anims.generateFrameNumbers("player", { start: 16, end: 22 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    console.log(this.anims);
+    this.createAnims();
 
     this.socket.on("currentPlayers", players => {
       Object.keys(players).forEach(id => {
         if (players[id].playerId === this.socket.id) {
-          this.displayPlayers(players[id], "player");
+          this.cameras.main.setBounds(-700, 0, 3000, 300);
+          this.cameras.main.startFollow(
+            this.displayPlayers(players[id], "player")
+          );
         } else {
           this.displayPlayers(players[id], "player"); //para cargar jugadores distintos al local.
         }
@@ -97,9 +105,11 @@ class MainScene extends Phaser.Scene {
       Object.keys(players).forEach(id => {
         this.players.getChildren().forEach(player => {
           if (players[id].playerId === player.playerId) {
-            this.playAnimations[players[id].anim](player,players[id]);
+            if (player.canAnimate)
+              this.playAnimations[players[id].anim](player, players[id]);
             player.setRotation(players[id].rotation);
             player.setPosition(players[id].x, players[id].y);
+            this.updatePlayerName(player, players[id]);
           }
         });
       });
@@ -109,9 +119,17 @@ class MainScene extends Phaser.Scene {
     this.leftKeyPressed = false;
     this.rightKeyPressed = false;
     this.upKeyPressed = false;
+    this.attack1KeyPressed = false;
 
     this.createTerrain();
     this.initPlatforms();
+  }
+
+  updatePlayerName(player, playerInfo) {
+    player.name.setPosition(
+      playerInfo.x - player.width / 2,
+      playerInfo.y - player.height
+    );
   }
 
   checkAnimations(playerInfo, player) {
@@ -145,21 +163,26 @@ class MainScene extends Phaser.Scene {
     const left = this.leftKeyPressed;
     const right = this.rightKeyPressed;
     const up = this.upKeyPressed;
+    const attack1 = this.attack1KeyPressed;
 
     this.leftKeyPressed = this.controls.left.isDown;
     this.rightKeyPressed = this.controls.right.isDown;
     this.upKeyPressed = this.controls.jump.isDown;
 
+    this.attack1KeyPressed = this.controls.attack1.isDown;
+
     if (
       left !== this.leftKeyPressed ||
       right !== this.rightKeyPressed ||
-      up !== this.upKeyPressed
+      up !== this.upKeyPressed ||
+      attack1 !== this.attack1KeyPressed
     ) {
       this.socket.emit("playerInput", {
         left: this.leftKeyPressed,
         right: this.rightKeyPressed,
         up: this.upKeyPressed,
-        didJump: !up && this.upKeyPressed
+        didJump: !up && this.upKeyPressed,
+        attack1: this.attack1KeyPressed && !attack1
       });
     }
   }
@@ -171,11 +194,39 @@ class MainScene extends Phaser.Scene {
     background.scaleX = 2;
   }
 
+  createAnims() {
+    this.anims.create({
+      key: "walk",
+      frames: this.anims.generateFrameNumbers("player", { start: 8, end: 13 }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "idle",
+      frames: this.anims.generateFrameNumbers("player", { start: 0, end: 2 }),
+      frameRate: 5,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "jump",
+      frames: this.anims.generateFrameNumbers("player", { start: 16, end: 22 }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "attack1",
+      frames: this.anims.generateFrameNumbers("player", { start: 94, end: 99 }),
+      frameRate: 18,
+      repeat: 0
+    });
+
+  }
+
   initPlatforms() {
     const platforms = this.add.group();
     var platformCount = 7;
     var platformY = config.height * 0.95;
-    var lastPlatformX = config.width * 0.5;
+    var lastPlatformX = -config.width * 0.5;
     for (var i = 0; i < platformCount; i++) {
       platforms.create(lastPlatformX, platformY, "ground");
       lastPlatformX += config.width * 0.5;

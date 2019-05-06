@@ -14,7 +14,7 @@ class GameScene extends Phaser.Scene {
   create() {
     this.players = this.physics.add.group();
     io.on("connection", socket => {
-      players[socket.id] = CreatePlayer(socket.id, 30, 30);
+      players[socket.id] = CreatePlayer(socket.id, 0, 30);
       this.addPlayer(players[socket.id]);
       socket.emit("currentPlayers", players);
       socket.broadcast.emit("newPlayer", players[socket.id]);
@@ -51,13 +51,13 @@ class GameScene extends Phaser.Scene {
       }
       if (input.left && grounded) {
         left();
-        playerModel.anim = "walk";
-        playerModel.side = SIDE.left;   
+        this.setAnim(playerModel, "walk");
+        playerModel.side = SIDE.left;
       }
       if (input.right && grounded) {
         right();
-        playerModel.anim = "walk";
-        playerModel.side = SIDE.right;            
+        this.setAnim(playerModel, "walk");
+        playerModel.side = SIDE.right;
       }
       if (
         playerModel.jumps > 0 &&
@@ -66,24 +66,32 @@ class GameScene extends Phaser.Scene {
         playerModel.canJump
       ) {
         if (input.left && !grounded) {
-            velocityX = -300
-            playerModel.side = SIDE.left;    
-        };
+          velocityX = -300;
+          playerModel.side = SIDE.left;
+        }
         if (input.right && !grounded) {
-            velocityX = 300
-            playerModel.side = SIDE.right;            
-        };
+          velocityX = 300;
+          playerModel.side = SIDE.right;
+        }
         player.setVelocityY(-500);
         playerModel.jumps -= 1;
-        playerModel.anim = "jump";
+        this.setAnim(playerModel, "jump");
         playerModel.canJump = false;
       }
       if (grounded && !input.didJump) {
         playerModel.restartJumps();
       }
-      if (!input.left && !input.right && grounded) playerModel.anim = "idle";
+      if (!input.left && !input.right && grounded) this.setAnim(playerModel, "idle");
       player.setVelocityX(velocityX);
-
+      if (grounded && input.attack1) {
+        //attack
+        this.setAnim(playerModel, "attack1");
+        playerModel.onAction = true;
+        setTimeout(() => {
+          playerModel.onAction = false;
+        }, 250);
+      }
+      console.log(playerModel.onAction);
       playerModel.x = player.x;
       playerModel.y = player.y;
       playerModel.velocityX = player.body.velocity.x;
@@ -93,6 +101,10 @@ class GameScene extends Phaser.Scene {
     });
     this.physics.world.wrap(this.players, 5);
     io.emit("playerUpdates", players);
+  }
+
+  setAnim(model, anim) {
+    if (!model.onAction) model.anim = anim;
   }
 
   addPlayer(playerInfo) {
@@ -144,23 +156,23 @@ class GameScene extends Phaser.Scene {
     this.platforms = this.physics.add.staticGroup();
     var platformCount = 7;
     var platformY = config.height * 0.95;
-    var lastPlatformX = config.width * 0.5;
+    var lastPlatformX = -config.width * 0.5;
     for (var i = 0; i < platformCount; i++) {
       this.platforms.create(lastPlatformX, platformY, "ground");
       lastPlatformX += config.width * 0.5;
     }
     this.physics.add.collider(Phaser.GameObjects.Rectangle);
-    this.platforms.addMultiple([
-      new Phaser.GameObjects.Rectangle(
-        this,
-        lastPlatformX,
-        platformY,
-        10,
-        1000,
-        0,
-        100
-      ),
-      new Phaser.GameObjects.Rectangle(this, 60, platformY, 10, 1000, 0, 10)
-    ]);
+    // this.platforms.addMultiple([
+    //   new Phaser.GameObjects.Rectangle(
+    //     this,
+    //     lastPlatformX,
+    //     platformY,
+    //     10,
+    //     1000,
+    //     0,
+    //     100
+    //   ),
+    //   new Phaser.GameObjects.Rectangle(this, 60, platformY, 10, 1000, 0, 10)
+    // ]);
   }
 }
