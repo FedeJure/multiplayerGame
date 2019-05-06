@@ -81,17 +81,17 @@ class GameScene extends Phaser.Scene {
       if (grounded && !input.didJump) {
         playerModel.restartJumps();
       }
-      if (!input.left && !input.right && grounded) this.setAnim(playerModel, "idle");
+      if (!input.left && !input.right && grounded)
+        this.setAnim(playerModel, "idle");
       player.setVelocityX(velocityX);
-      if (grounded && input.attack1) {
+      if (grounded && input.attack1 && !playerModel.onAction) {
         //attack
-        this.setAnim(playerModel, "attack1");
+        this.setAnim(playerModel, playerModel.attacks.attack1.anim);
         playerModel.onAction = true;
         setTimeout(() => {
           playerModel.onAction = false;
-        }, 250);
+        }, playerModel.attacks.attack1.duration);
       }
-      console.log(playerModel.onAction);
       playerModel.x = player.x;
       playerModel.y = player.y;
       playerModel.velocityX = player.body.velocity.x;
@@ -162,17 +162,5 @@ class GameScene extends Phaser.Scene {
       lastPlatformX += config.width * 0.5;
     }
     this.physics.add.collider(Phaser.GameObjects.Rectangle);
-    // this.platforms.addMultiple([
-    //   new Phaser.GameObjects.Rectangle(
-    //     this,
-    //     lastPlatformX,
-    //     platformY,
-    //     10,
-    //     1000,
-    //     0,
-    //     100
-    //   ),
-    //   new Phaser.GameObjects.Rectangle(this, 60, platformY, 10, 1000, 0, 10)
-    // ]);
   }
 }
