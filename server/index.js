@@ -2,7 +2,7 @@ const path = require('path');
 const jsdom = require('jsdom');
 const express = require('express');
 const app = express();
-const server = require('https').Server(app);
+const server = require('http').Server(app);
 const io = require('socket.io').listen(server);
 const Datauri = require('datauri');
 const datauri = new Datauri();
@@ -11,6 +11,7 @@ const { JSDOM } = jsdom;
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', function (req, res) {
+  console.log("asfasfasfasfasf")
   res.sendFile(__dirname + '/index.html');
 });
 
