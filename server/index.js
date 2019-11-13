@@ -2,7 +2,7 @@ const path = require('path');
 const jsdom = require('jsdom');
 const express = require('express');
 const app = express();
-const server = require('http').Server(app);
+const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);
 const Datauri = require('datauri');
 const datauri = new Datauri();
@@ -13,6 +13,10 @@ app.use(express.static(__dirname + '/public'));
 app.get('/', function (req, res) {
   console.log("asfasfasfasfasf")
   res.sendFile(__dirname + '/index.html');
+});
+
+server.on('request', (request, response) => {
+  console.log(JSON.stringify(request))
 });
 
 
@@ -33,7 +37,7 @@ function setupAuthoritativePhaser() {
     dom.window.URL.revokeObjectURL = (objectURL) => { };
     dom.window.gameLoaded = () => {
       server.listen(8080, function () {
-        console.log(`Listening on ${server.address().port}, ${JSON.stringify(server.address())}`);
+        console.log(`Listening on ${app.address().port}, ${JSON.stringify(app.address())}`);
       });
     };
 
