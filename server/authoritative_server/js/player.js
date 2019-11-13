@@ -2,6 +2,7 @@ const SIDE = { left: -1, right: 1 };
 
 const CreatePlayer = (playerId, x, y) => {
   return {
+    name,
     rotation: 0,
     x,
     y,

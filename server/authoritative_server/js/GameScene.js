@@ -13,11 +13,13 @@ class GameScene extends Phaser.Scene {
 
   create() {
     this.players = this.physics.add.group();
+    this.createTerrain();
+    this.initPlatforms();
     io.on("connection", socket => {
-      players[socket.id] = CreatePlayer(socket.id, 0, 30);
+      players[socket.id] = CreatePlayer(socket.id, 0, 30,socket.name);
       this.addPlayer(players[socket.id]);
-      socket.emit("currentPlayers", players);
-      socket.broadcast.emit("newPlayer", players[socket.id]);
+      socket.emit("connectionSuccess",socket.id);
+
 
       socket.on("disconnect", () => {
         this.removePlayer(socket.id);
@@ -25,12 +27,17 @@ class GameScene extends Phaser.Scene {
         io.emit("disconnect", socket.id);
       });
 
+      socket.on("setPlayerName", ({id, name}) => {
+        players[id].name = name;
+        socket.emit("currentPlayers", players);
+        socket.broadcast.emit("newPlayer", players[socket.id]);
+      });
+
       socket.on("playerInput", inputData => {
         this.handlePlayerInput(socket.id, inputData);
       });
     });
-    this.createTerrain();
-    this.initPlatforms();
+
   }
 
   update(time, delta) {
@@ -92,6 +99,7 @@ class GameScene extends Phaser.Scene {
           playerModel.onAction = false;
         }, playerModel.attacks.attack1.duration);
       }
+      //console.log("PLAYER POSITION: X:",player.x," Y: ",player.y);
       playerModel.x = player.x;
       playerModel.y = player.y;
       playerModel.velocityX = player.body.velocity.x;
@@ -99,7 +107,7 @@ class GameScene extends Phaser.Scene {
       playerModel.grounded = grounded;
       playerModel.rotation = player.rotation;
     });
-    this.physics.world.wrap(this.players, 5);
+    //this.physics.world.wrap(this.players, -1);
     io.emit("playerUpdates", players);
   }
 
@@ -114,6 +122,8 @@ class GameScene extends Phaser.Scene {
       .setDisplaySize(53, 40);
     player.setDrag(100);
     player.setAngularDrag(100);
+    player.setCollideWorldBounds(true);
+    player.onWorldBounds = true;
     player.playerId = playerInfo.playerId;
     playerInfo.physic = player;
     this.players.add(player);
@@ -160,7 +170,6 @@ class GameScene extends Phaser.Scene {
     for (var i = 0; i < platformCount; i++) {
       this.platforms.create(lastPlatformX, platformY, "ground");
       lastPlatformX += config.width * 0.5;
-    }
-    this.physics.add.collider(Phaser.GameObjects.Rectangle);
+    }    
   }
 }

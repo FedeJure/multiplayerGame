@@ -38,7 +38,7 @@ class MainScene extends Phaser.Scene {
       .setDisplaySize(53, 40);
     player.playerId = playerInfo.playerId;
     player.anims.play("idle");
-    player.name = this.add.text(0, 0, "Nombre", {
+    player.name = this.add.text(0, 0, playerInfo.name, {
       fontFamily: '"Roboto Condensed"'
     });
     this.updatePlayerName(player, playerInfo);
@@ -75,6 +75,10 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor("#ccccff");
 
     this.createAnims();
+
+    this.socket.on("connectionSuccess", (id) => {
+      this.socket.emit("setPlayerName",{id: id, name: "UnNombre"})
+    });
 
     this.socket.on("currentPlayers", players => {
       Object.keys(players).forEach(id => {
