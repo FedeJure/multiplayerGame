@@ -77,7 +77,7 @@ class MainScene extends Phaser.Scene {
     this.createAnims();
 
     this.socket.on("connectionSuccess", (id) => {
-      this.socket.emit("setPlayerName",{id: id, name: "UnNombre"})
+      this.socket.emit("setPlayerName",{id: id, name: localStorage.getItem("playerName")});
     });
 
     this.socket.on("currentPlayers", players => {
