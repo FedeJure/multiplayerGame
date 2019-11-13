@@ -87,6 +87,7 @@ class MainScene extends Phaser.Scene {
           this.cameras.main.startFollow(
             this.displayPlayers(players[id], "player")
           );
+          this.player = players[id];
         } else {
           this.displayPlayers(players[id], "player"); //para cargar jugadores distintos al local.
         }
@@ -100,6 +101,7 @@ class MainScene extends Phaser.Scene {
     this.socket.on("disconnect", playerId => {
       this.players.getChildren().forEach(player => {
         if (playerId === player.playerId) {
+          player.name.destroy();
           player.destroy();
         }
       });
