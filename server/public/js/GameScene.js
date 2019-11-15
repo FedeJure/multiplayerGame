@@ -1,52 +1,14 @@
+const players = {};
 class MainScene extends Phaser.Scene {
+
   constructor() {
     super({ key: "MainGame", active: true });
-    this.playAnimations = {
-      idle: (player, info) => {
-        if (player.anims.currentAnim.key == "idle") return;
-        player.scaleX = info.side;
-        player.anims.play("idle");
-      },
-      walk: (player, info) => {
-        if (
-          player.anims.currentAnim.key == "walk" &&
-          player.scaleX == info.side
-        )
-          return;
-        player.scaleX = info.side;
-        player.anims.play("walk");
-      },
-      jump: (player, info) => {
-        if (player.anims.currentAnim.key == "jump") return;
-        player.scaleX = info.side;
-        player.anims.play("jump");
-      },
-      attack1: (player, info) => {
-        if (player.anims.currentAnim.key == "attack1") return;
-        player.canAnimate = false;
-        console.log(player)
-        player.scaleX = info.side;
-        player.anims.play("attack1");
-      }
-    };
+
   }
 
   displayPlayers(playerInfo, sprite) {
-    const player = this.add
-      .sprite(playerInfo.x, playerInfo.y, "player")
-      .setOrigin(0.5, 0.5)
-      .setDisplaySize(53, 40);
-    player.playerId = playerInfo.playerId;
-    player.anims.play("idle");
-    player.name = this.add.text(0, 0, playerInfo.name, {
-      fontFamily: '"Roboto Condensed"'
-    });
-    this.updatePlayerName(player, playerInfo);
-    player.canAnimate = true;
-    player.on("animationcomplete", key => {
-      if (!player.canAnimate) player.canAnimate = true;
-    });
-    this.players.add(player);
+    const player = new Player(this, playerInfo);
+    players[player.playerId] = player;
     return player;
   }
 
@@ -71,7 +33,6 @@ class MainScene extends Phaser.Scene {
 
   create() {
     this.socket = io();
-    this.players = this.add.group();
     this.cameras.main.setBackgroundColor("#ccccff");
 
     this.createAnims();
@@ -83,11 +44,13 @@ class MainScene extends Phaser.Scene {
     this.socket.on("currentPlayers", players => {
       Object.keys(players).forEach(id => {
         if (players[id].playerId === this.socket.id) {
-          this.cameras.main.setBounds(-700, 0, 3000, 300);
+          //his.cameras.main.setBounds(-700, 300, 3000, 0);
+          const createdPlayer = this.displayPlayers(players[id], "player");
           this.cameras.main.startFollow(
-            this.displayPlayers(players[id], "player")
+            createdPlayer
           );
-          this.player = players[id];
+          this.cameras.main.zoom = 2;
+          createdPlayer.setIsLocalPlayer();
         } else {
           this.displayPlayers(players[id], "player"); //para cargar jugadores distintos al local.
         }
@@ -99,26 +62,18 @@ class MainScene extends Phaser.Scene {
     });
 
     this.socket.on("disconnect", playerId => {
-      this.players.getChildren().forEach(player => {
-        if (playerId === player.playerId) {
-          player.name.destroy();
-          player.destroy();
+      Object.keys(players).forEach(id => {
+        if (playerId === players[id].playerId) {
+          players[id].destroy();
         }
       });
     });
 
-    this.socket.on("playerUpdates", players => {
+    this.socket.on("playerUpdates", incommingPlayerInfos => {
       Object.keys(players).forEach(id => {
-        this.players.getChildren().forEach(player => {
-          if (players[id].playerId === player.playerId) {
-            if (player.canAnimate)
-              this.playAnimations[players[id].anim](player, players[id]);
-            player.setRotation(players[id].rotation);
-            player.setPosition(players[id].x, players[id].y);
-            this.updatePlayerName(player, players[id]);
-          }
-        });
+        players[id].updateState(incommingPlayerInfos[id]);
       });
+
     });
 
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -129,40 +84,6 @@ class MainScene extends Phaser.Scene {
 
     this.createTerrain();
     this.initPlatforms();
-  }
-
-  updatePlayerName(player, playerInfo) {
-    player.name.setPosition(
-      playerInfo.x - player.width / 2,
-      playerInfo.y - player.height
-    );
-  }
-
-  checkAnimations(playerInfo, player) {
-    if (playerInfo.velocityY < 0 && player.anims.currentAnim.key != "jump") {
-      player.anims.play("jump");
-      return;
-    }
-    if (
-      playerInfo.velocityX > 0 &&
-      (player.anims.currentAnim.key != "walk" || player.scaleX < 0)
-    ) {
-      player.scaleX = Math.abs(player.scaleX);
-      player.anims.play("walk");
-      return;
-    }
-    if (
-      playerInfo.velocityX < 0 &&
-      (player.anims.currentAnim.key != "walk" || player.scaleX > 0)
-    ) {
-      player.scaleX = -Math.abs(player.scaleX);
-      player.anims.play("walk");
-      return;
-    }
-    if (playerInfo.velocityX == 0 && player.anims.currentAnim.key != "idle") {
-      player.anims.play("idle");
-      return;
-    }
   }
 
   update() {
@@ -251,3 +172,4 @@ class MainScene extends Phaser.Scene {
     ]);
   }
 }
+

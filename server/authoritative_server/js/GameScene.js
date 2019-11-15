@@ -47,6 +47,7 @@ class GameScene extends Phaser.Scene {
       var grounded = player.body.touching.down;
       var velocityX = 0;
 
+
       var left = () => (velocityX -= 300);
       var right = () => (velocityX += 300);
 
