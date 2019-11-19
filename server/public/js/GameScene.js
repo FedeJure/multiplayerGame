@@ -1,4 +1,10 @@
 const players = {};
+let savedInput = {
+  leftKeyPressed: false,
+  rightKeyPressed: false,
+  upKeyPressed: false,
+  attack1KeyPressed: false
+};
 let localPlayer = null;
 class MainScene extends Phaser.Scene {
 
@@ -84,44 +90,32 @@ class MainScene extends Phaser.Scene {
     });*/
 
     this.cursors = this.input.keyboard.createCursorKeys();
-    this.leftKeyPressed = false;
-    this.rightKeyPressed = false;
-    this.upKeyPressed = false;
-    this.attack1KeyPressed = false;
 
     this.createTerrain();
     this.initPlatforms();
   }
 
   update() {
-    if (localPlayer != null) {
-      localPlayer.update();
+    const input = {
+      left : this.controls.left.isDown,
+      right : this.controls.right.isDown,
+      up : this.controls.jump.isDown,
+      didJump : !up && this.controls.jump.isDown,
+      attack1KeyPressed : this.controls.attack1.isDown,
     }
-    const left = this.leftKeyPressed;
-    const right = this.rightKeyPressed;
-    const up = this.upKeyPressed;
-    const attack1 = this.attack1KeyPressed;
-
-    this.leftKeyPressed = this.controls.left.isDown;
-    this.rightKeyPressed = this.controls.right.isDown;
-    this.upKeyPressed = this.controls.jump.isDown;
-
-    this.attack1KeyPressed = this.controls.attack1.isDown;
+    if (localPlayer != null) {
+      localPlayer.update(input);
+    }
 
     if (
-      left !== this.leftKeyPressed ||
-      right !== this.rightKeyPressed ||
-      up !== this.upKeyPressed ||
-      attack1 !== this.attack1KeyPressed
+      savedInput.leftKeyPressed !== input.left ||
+      savedInput.rightKeyPressed !== input.right ||
+      savedInput.upKeyPressed !== input.up ||
+      savedInput.attack1KeyPressed !== input.attack1KeyPressed
     ) {
-      this.socket.emit("playerInput", {
-        left: this.leftKeyPressed,
-        right: this.rightKeyPressed,
-        up: this.upKeyPressed,
-        didJump: !up && this.upKeyPressed,
-        attack1: this.attack1KeyPressed && !attack1
-      });
+      this.socket.emit("playerInput", input);
     }
+    savedInput = {...input};
   }
 
   createTerrain() {
