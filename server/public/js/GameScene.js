@@ -9,13 +9,8 @@ class MainScene extends Phaser.Scene {
 
   displayPlayers(playerInfo, sprite) {
     const player = new Player(this, playerInfo,this.controls);
-    this.physics.add.existing(player); 
-    this.add.existing(player); 
-    console.log(player)     
-    player.setDrag(100);
-    player.setAngularDrag(100);
-    player.setCollideWorldBounds(true);
     players[player.playerId] = player;
+    this.physics.add.collider(player, this.platforms);
     return player;
   }
 
@@ -55,7 +50,7 @@ class MainScene extends Phaser.Scene {
           this.cameras.main.startFollow(
             createdPlayer
           );
-          this.cameras.main.zoom = 2;
+          this.cameras.main.zoom = 1;
           createdPlayer.setIsLocalPlayer();
           localPlayer = createdPlayer;
         } else {
@@ -133,25 +128,25 @@ class MainScene extends Phaser.Scene {
 
 
   initPlatforms() {
-    const platforms = this.physics.add.staticGroup();
+    this.platforms = this.physics.add.staticGroup();
     var platformCount = 7;
     var platformY = config.height * 0.95;
     var lastPlatformX = -config.width * 0.5;
     for (var i = 0; i < platformCount; i++) {
-      platforms.create(lastPlatformX, platformY, "ground");
+      this.platforms.create(lastPlatformX, platformY, "ground");
       lastPlatformX += config.width * 0.5;
     }
-    platforms.addMultiple([
+    this.platforms.addMultiple([
       new Phaser.GameObjects.Rectangle(
         this,
-        lastPlatformX,
+        -1000,
         platformY,
         10,
         1000,
         0,
         100
       ),
-      new Phaser.GameObjects.Rectangle(this, 60, platformY, 10, 1000, 0, 10)
+      new Phaser.GameObjects.Rectangle(this, 2000, platformY, 10, 1000, 0, 10)
     ]);
   }
 }
