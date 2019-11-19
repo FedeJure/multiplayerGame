@@ -3,6 +3,14 @@ const config = {
   parent: 'phaser-example',
   width: 800,
   height: 600,
+  autoFocus: false,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      debug: false,
+      gravity: { y: 2000 }
+    }
+  },
   scene: [MainScene]
 };
 

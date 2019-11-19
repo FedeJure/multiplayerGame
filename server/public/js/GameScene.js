@@ -1,4 +1,5 @@
 const players = {};
+let localPlayer = null;
 class MainScene extends Phaser.Scene {
 
   constructor() {
@@ -7,10 +8,17 @@ class MainScene extends Phaser.Scene {
   }
 
   displayPlayers(playerInfo, sprite) {
-    const player = new Player(this, playerInfo);
+    const player = new Player(this, playerInfo,this.controls);
+    this.physics.add.existing(player); 
+    this.add.existing(player); 
+    console.log(player)     
+    player.setDrag(100);
+    player.setAngularDrag(100);
+    player.setCollideWorldBounds(true);
     players[player.playerId] = player;
     return player;
   }
+
 
   preload() {
     this.load.spritesheet("player", "assets/player_anims.png", {
@@ -35,8 +43,6 @@ class MainScene extends Phaser.Scene {
     this.socket = io();
     this.cameras.main.setBackgroundColor("#ccccff");
 
-    this.createAnims();
-
     this.socket.on("connectionSuccess", (id) => {
       this.socket.emit("setPlayerName",{id: id, name: localStorage.getItem("playerName")});
     });
@@ -51,6 +57,7 @@ class MainScene extends Phaser.Scene {
           );
           this.cameras.main.zoom = 2;
           createdPlayer.setIsLocalPlayer();
+          localPlayer = createdPlayer;
         } else {
           this.displayPlayers(players[id], "player"); //para cargar jugadores distintos al local.
         }
@@ -69,12 +76,12 @@ class MainScene extends Phaser.Scene {
       });
     });
 
-    this.socket.on("playerUpdates", incommingPlayerInfos => {
+    /*this.socket.on("playerUpdates", incommingPlayerInfos => {
       Object.keys(players).forEach(id => {
         players[id].updateState(incommingPlayerInfos[id]);
       });
 
-    });
+    });*/
 
     this.cursors = this.input.keyboard.createCursorKeys();
     this.leftKeyPressed = false;
@@ -87,6 +94,9 @@ class MainScene extends Phaser.Scene {
   }
 
   update() {
+    if (localPlayer != null) {
+      localPlayer.update();
+    }
     const left = this.leftKeyPressed;
     const right = this.rightKeyPressed;
     const up = this.upKeyPressed;
@@ -121,36 +131,9 @@ class MainScene extends Phaser.Scene {
     background.scaleX = 2;
   }
 
-  createAnims() {
-    this.anims.create({
-      key: "walk",
-      frames: this.anims.generateFrameNumbers("player", { start: 8, end: 13 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    this.anims.create({
-      key: "idle",
-      frames: this.anims.generateFrameNumbers("player", { start: 0, end: 2 }),
-      frameRate: 5,
-      repeat: -1
-    });
-    this.anims.create({
-      key: "jump",
-      frames: this.anims.generateFrameNumbers("player", { start: 16, end: 22 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    this.anims.create({
-      key: "attack1",
-      frames: this.anims.generateFrameNumbers("player", { start: 94, end: 99 }),
-      frameRate: 18,
-      repeat: 0
-    });
-
-  }
 
   initPlatforms() {
-    const platforms = this.add.group();
+    const platforms = this.physics.add.staticGroup();
     var platformCount = 7;
     var platformY = config.height * 0.95;
     var lastPlatformX = -config.width * 0.5;
