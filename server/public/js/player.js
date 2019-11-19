@@ -116,7 +116,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         attack1KeyPressed : this.controls.attack1.isDown,
       }
 
-      var grounded = true;
+      var grounded = this.body.touching.down;
       var velocityX = 0;
 
       var left = () => (velocityX -= 300);
@@ -207,7 +207,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   }*/
 
   restartJumps() {
-    this.jumps = 2;
+    console.log("restart jumps")
   }
   
   }
