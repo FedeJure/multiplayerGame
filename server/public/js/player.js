@@ -1,28 +1,28 @@
 const playerAnimations = {
-  idle: (player, playerModel) => {
-    if (playerModel.anims.currentAnim.key == "idle") return;
-    playerModel.flipX = player.side;
-    playerModel.anims.play("idle");
+  idle: (player) => {
+    if (player.anims.currentAnim.key == "idle") return;
+    player.flipX = player.side;
+    player.anims.play("idle");
   },
   walk: (player) => {
     if (
-      playerModel.anims.currentAnim.key == "walk" &&
-      playerModel.flipX == player.side
+      player.anims.currentAnim.key == "walk" &&
+      player.flipX == player.side
     )
       return;
-      playerModel.flipX = player.side;
-      playerModel.anims.play("walk");
+      player.flipX = player.side;
+    player.anims.play("walk");
   },
   jump: (player) => {
-    if (playerModel.anims.currentAnim.key == "jump") return;
-    playerModel.flipX = player.side;
-    playerModel.anims.play("jump");
+    if (player.anims.currentAnim.key == "jump") return;
+    player.flipX = player.side;
+    player.anims.play("jump");
   },
   attack1: (player) => {
-    if (playerModel.anims.currentAnim.key == "attack1") return;
+    if (player.anims.currentAnim.key == "attack1") return;
     player.canAnimate = false;
-    playerModel.flipX = player.side;
-    playerModel.anims.play("attack1");
+    player.flipX = player.side;
+    player.anims.play("attack1");
   }
 };
 
@@ -30,32 +30,27 @@ const SIDE = { left: true, right: false };
 
 const initialJumps = 2;
 
-class Player extends Phaser.Physics.Arcade.Group {
+class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, playerInfo, controls) {
-        super()
-        this.model = new Phaser.Physics.Arcade.Sprite(scene, playerInfo.x, playerInfo.y, "player");
-        console.log(this)
+        super(scene, playerInfo.x, playerInfo.y, "player")
         this.controls = controls;
-        this.model.setOrigin(0.5, 0.5)
-        this.model.playerId = playerInfo.playerId;
+        this.setOrigin(0.5, 0.5)
+        this.playerId = playerInfo.playerId;
         this.createAnims(scene);
-        this.model.scaleX = 1;
-        this.model.scaleY = 1;
-        this.model.anims.play("idle");
+        this.scaleX = 1;
+        this.scaleY = 1;
+        this.anims.play("idle");
         this.name = scene.add.text(0, 0, playerInfo.name, {
             fontFamily: '"Roboto Condensed"'
         });
+        console.log(this)
         this.canAnimate = true;
-        this.model.on("animationcomplete", key => {
+        this.on("animationcomplete", key => {
             if (!this.canAnimate) this.canAnimate = true;
         });
         this.isLocalPlayer = false;
         this.jumps = initialJumps;
         this.side = SIDE.right;
-
-
-        scene.physics.add.existing(this); 
-        scene.add.existing(this);
     }
 
     createAnims(scene) {
@@ -89,7 +84,7 @@ class Player extends Phaser.Physics.Arcade.Group {
     updateState(playerInfo) {
       if (this.localPlayer) {
         if (this.canAnimate)
-          playerAnimations[playerInfo.anim](this.model, playerInfo);
+          playerAnimations[playerInfo.anim](this, playerInfo);
         this.setRotation(playerInfo.rotation);
         this.setPosition(playerInfo.x, playerInfo.y);
         this.updatePlayerName();
@@ -98,15 +93,14 @@ class Player extends Phaser.Physics.Arcade.Group {
 
     updatePlayerName() {
       this.name.setPosition(
-        this.model.body.position.x,
-        this.model.body.position.y - this.model.body.height * 0.5
+        this.body.position.x,
+        this.body.position.y - this.body.height * 0.5
       );
     }
 
     destroy() {
-      this.model.destroy();
-      this.name.destroy();
       this.destroy();
+      this.name.destroy();
     }
 
     setIsLocalPlayer() {
@@ -129,10 +123,10 @@ class Player extends Phaser.Physics.Arcade.Group {
       var right = () => (velocityX += 300);
 
       if (!input.didJump) {
-        this.model.canJump = true;
+        this.canJump = true;
       }
       if (!grounded) {
-        velocityX = this.model.body.velocity.x;
+        velocityX = this.body.velocity.x;
       }
       if (input.left && grounded) {
         left();
@@ -175,14 +169,14 @@ class Player extends Phaser.Physics.Arcade.Group {
         this.onAction = true;
         setTimeout(() => {
           this.onAction = false;
-        }, 500/*this.model.attacks.attack1.duration*/);
+        }, 500/*this.attacks.attack1.duration*/);
       }
 
       this.updatePlayerName();
     }
 
     setAnim(anim) {
-      if (!this.onAction) playerAnimations[anim](this, this.model);
+      if (!this.onAction) playerAnimations[anim](this);
     }
 
       /*checkAnimations(playerInfo, player) {
@@ -213,7 +207,7 @@ class Player extends Phaser.Physics.Arcade.Group {
   }*/
 
   restartJumps() {
-    this.model.jumps = 2;
+    this.jumps = 2;
   }
   
   }
