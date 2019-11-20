@@ -14,7 +14,8 @@ class MainScene extends Phaser.Scene {
   }
 
   displayPlayers(playerInfo, sprite) {
-    const player = new Player(this, playerInfo,this.controls);
+    const player = new Player(this, playerInfo.x, playerInfo.y, playerInfo.name, playerInfo.playerId,this.controls);
+    console.log(player)
     this.physics.add.existing(player); 
     this.add.existing(player);
     player.setDrag(100);
@@ -54,6 +55,7 @@ class MainScene extends Phaser.Scene {
     });
 
     this.socket.on("currentPlayers", players => {
+      console.log(players)
       Object.keys(players).forEach(id => {
         if (players[id].playerId === this.socket.id) {
           //his.cameras.main.setBounds(-700, 300, 3000, 0);
@@ -82,12 +84,13 @@ class MainScene extends Phaser.Scene {
       });
     });
 
-    /*this.socket.on("playerUpdates", incommingPlayerInfos => {
-      Object.keys(players).forEach(id => {
+    this.socket.on("playerUpdates", playerState => {
+      if (players[playerState.playerId] != null)
+        players[playerState.playerId].validateState(playerState);
+      /*Object.keys(players).forEach(id => {
         players[id].updateState(incommingPlayerInfos[id]);
-      });
-
-    });*/
+      });*/
+    });
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -100,7 +103,7 @@ class MainScene extends Phaser.Scene {
       left : this.controls.left.isDown,
       right : this.controls.right.isDown,
       up : this.controls.jump.isDown,
-      didJump : !up && this.controls.jump.isDown,
+      didJump : !savedInput.up && this.controls.jump.isDown,
       attack1KeyPressed : this.controls.attack1.isDown,
     }
     if (localPlayer != null) {
@@ -108,10 +111,10 @@ class MainScene extends Phaser.Scene {
     }
 
     if (
-      savedInput.leftKeyPressed !== input.left ||
-      savedInput.rightKeyPressed !== input.right ||
-      savedInput.upKeyPressed !== input.up ||
-      savedInput.attack1KeyPressed !== input.attack1KeyPressed
+      savedInput.left !== input.left ||
+      savedInput.right !== input.right ||
+      savedInput.up !== input.up ||
+      savedInput.attack1 !== input.attack1
     ) {
       this.socket.emit("playerInput", input);
     }

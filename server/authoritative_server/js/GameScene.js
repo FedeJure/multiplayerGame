@@ -16,8 +16,9 @@ class GameScene extends Phaser.Scene {
     this.createTerrain();
     this.initPlatforms();
     io.on("connection", socket => {
-      players[socket.id] = CreatePlayer(socket.id, 0, 30,socket.name);
-      this.addPlayer(players[socket.id]);
+      //players[socket.id] = CreatePlayer(socket.id, 0, 30,socket.name);
+      this.addPlayer(socket.id, 0, 30,socket.name);
+      
       socket.emit("connectionSuccess",socket.id);
 
 
@@ -29,8 +30,8 @@ class GameScene extends Phaser.Scene {
 
       socket.on("setPlayerName", ({id, name}) => {
         players[id].name = name;
-        socket.emit("currentPlayers", players);
-        socket.broadcast.emit("newPlayer", players[socket.id]);
+        socket.emit("currentPlayers",Object.values(players).map(player => player.getRepresentation()) );
+        socket.broadcast.emit("newPlayer", players[socket.id].getRepresentation());
       });
 
       socket.on("playerInput", inputData => {
@@ -41,7 +42,7 @@ class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-    this.players.getChildren().forEach(player => {
+    /*this.players.getChildren().forEach(player => {
       const playerModel = players[player.playerId];
       const input = playerModel.input;
       var grounded = player.body.touching.down;
@@ -109,25 +110,19 @@ class GameScene extends Phaser.Scene {
       playerModel.rotation = player.rotation;
     });
     //this.physics.world.wrap(this.players, -1);
-    io.emit("playerUpdates", players);
+    io.emit("playerUpdates", players);*/
   }
 
-  setAnim(model, anim) {
-    if (!model.onAction) model.anim = anim;
-  }
+  addPlayer(id, x, y, name) {
 
-  addPlayer(playerInfo) {
-    const player = this.physics.add
-      .sprite(playerInfo.x, playerInfo.y, playerInfo.image)
-      .setOrigin(0.5, 0.5)
-      .setDisplaySize(53, 40);
+    const player = new HeadlessPlayer(this, x, y, name, id, this.controls);
+    this.physics.add.existing(player); 
+    this.add.existing(player);
     player.setDrag(100);
     player.setAngularDrag(100);
-    player.setCollideWorldBounds(true);
-    player.onWorldBounds = true;
-    player.playerId = playerInfo.playerId;
-    playerInfo.physic = player;
+    player.setCollideWorldBounds(false);
     this.players.add(player);
+    players[id] = player;
     this.physics.add.collider(player, this.platforms);
   }
 
@@ -149,11 +144,8 @@ class GameScene extends Phaser.Scene {
   }
 
   handlePlayerInput(playerId, input) {
-    this.players.getChildren().forEach(player => {
-      if (playerId === player.playerId) {
-        players[player.playerId].input = input;
-      }
-    });
+    players[playerId].update(input)
+    io.emit("playerUpdates", players[playerId].getRepresentation());
   }
 
   createTerrain() {
@@ -171,6 +163,18 @@ class GameScene extends Phaser.Scene {
     for (var i = 0; i < platformCount; i++) {
       this.platforms.create(lastPlatformX, platformY, "ground");
       lastPlatformX += config.width * 0.5;
-    }    
+    }
+    this.platforms.addMultiple([
+      new Phaser.GameObjects.Rectangle(
+        this,
+        -1000,
+        platformY,
+        10,
+        1000,
+        0,
+        100
+      ),
+      new Phaser.GameObjects.Rectangle(this, 2000, platformY, 10, 1000, 0, 10)
+    ]);  
   }
 }

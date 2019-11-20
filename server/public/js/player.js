@@ -28,19 +28,18 @@ const SIDE = { left: true, right: false };
 const initialJumps = 2;
 
 class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, playerInfo, controls) {
-    super(scene, playerInfo.x, playerInfo.y, "player");
+  constructor(scene, x, y, name, playerId, controls) {
+    super(scene, x, y, "player");
     this.controls = controls;
     this.setOrigin(0.5, 0.5);
-    this.playerId = playerInfo.playerId;
+    this.playerId = playerId;
     this.createAnims(scene);
     this.scaleX = 1;
     this.scaleY = 1;
     this.anims.play("idle");
-    this.name = scene.add.text(0, 0, playerInfo.name, {
+    this.name = scene.add.text(0, 0, name, {
       fontFamily: '"Roboto Condensed"'
     });
-    console.log(this);
     this.canAnimate = true;
     this.on("animationcomplete", key => {
       if (!this.canAnimate) this.canAnimate = true;
@@ -49,6 +48,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.jumps = initialJumps;
     this.side = SIDE.right;
   }
+
 
   createAnims(scene) {
     scene.anims.create({
@@ -100,8 +100,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   destroy() {
-    this.destroy();
     this.name.destroy();
+    super.destroy();
   }
 
   setIsLocalPlayer() {
@@ -166,34 +166,24 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     if (!this.onAction) playerAnimations[anim](this);
   }
 
-  /*checkAnimations(playerInfo, player) {
-    if (playerInfo.velocityY < 0 && player.anims.currentAnim.key != "jump") {
-      player.anims.play("jump");
-      return;
-    }
-    if (
-      playerInfo.velocityX > 0 &&
-      (player.anims.currentAnim.key != "walk" || player.scaleX < 0)
-    ) {
-      player.scaleX = Math.abs(player.scaleX);
-      player.anims.play("walk");
-      return;
-    }
-    if (
-      playerInfo.velocityX < 0 &&
-      (player.anims.currentAnim.key != "walk" || player.scaleX > 0)
-    ) {
-      player.scaleX = -Math.abs(player.scaleX);
-      player.anims.play("walk");
-      return;
-    }
-    if (playerInfo.velocityX == 0 && player.anims.currentAnim.key != "idle") {
-      player.anims.play("idle");
-      return;
-    }
-  }*/
-
   restartJumps() {
     this.jumps = initialJumps;
+  }
+
+  validateState(state) {
+    const precisionPosition = 100;
+    const precisionVelocity = 100;
+    if (
+      Math.abs(state.x - this.x) > precisionPosition ||
+      Math.abs(state.y - this.y) > precisionPosition ||
+      state.side != this.side
+    ) {
+      console.log(state,this);
+      this.setVelocityX(state.velocityX);
+      this.setVelocityY(state.velocityY);
+      this.side = state.side;
+      this.x = state.x;
+      this.y = state.y;
+    }
   }
 }
