@@ -31,6 +31,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, name, playerId, controls) {
     super(scene, x, y, "player");
     this.controls = controls;
+    this.remoteState = {};
     this.setOrigin(0.5, 0.5);
     this.playerId = playerId;
     this.createAnims(scene);
@@ -170,7 +171,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.jumps = initialJumps;
   }
 
-  validateState(state) {
+  validateState() {
+    const state = this.remoteState;
     const precisionPosition = 100;
     const precisionVelocity = 100;
     if (

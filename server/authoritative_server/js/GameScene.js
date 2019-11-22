@@ -111,6 +111,8 @@ class GameScene extends Phaser.Scene {
     });
     //this.physics.world.wrap(this.players, -1);
     io.emit("playerUpdates", players);*/
+
+    io.emit("playersUpdate", Object.values(players).map(player => player.getRepresentation()));
   }
 
   addPlayer(id, x, y, name) {

@@ -42,7 +42,8 @@ class MainScene extends Phaser.Scene {
       jump: "SPACE",
       attack1: "U",
       attack2: "I",
-      attack3: "O"
+      attack3: "O",
+      lag: "L"
     });
   }
 
@@ -86,11 +87,18 @@ class MainScene extends Phaser.Scene {
 
     this.socket.on("playerUpdates", playerState => {
       if (players[playerState.playerId] != null)
-        players[playerState.playerId].validateState(playerState);
-      /*Object.keys(players).forEach(id => {
-        players[id].updateState(incommingPlayerInfos[id]);
-      });*/
+        players[playerState.playerId].remoteState = playerState;
     });
+
+    this.socket.on("playersUpdate",playersStates => {
+      playersStates.forEach(state => {
+        if (players[state.playerId] != null) {
+          players[state.playerId].remoteState = state;
+          players[state.playerId].validateState()        
+        }
+      })
+
+    })
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -119,6 +127,9 @@ class MainScene extends Phaser.Scene {
       this.socket.emit("playerInput", input);
     }
     savedInput = {...input};
+    if (this.controls.lag.isDown) {
+      localPlayer.validateState()
+    }
   }
 
   createTerrain() {
