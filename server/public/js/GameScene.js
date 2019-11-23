@@ -21,7 +21,6 @@ class MainScene extends Phaser.Scene {
     player.setDrag(100);
     player.setAngularDrag(100);
     player.setCollideWorldBounds(false);
-    players[player.playerId] = player;
     this.physics.add.collider(player, this.platforms);
     return player;
   }
@@ -68,13 +67,16 @@ class MainScene extends Phaser.Scene {
           createdPlayer.setIsLocalPlayer();
           localPlayer = createdPlayer;
         } else {
-          this.displayPlayers(players[id], "player"); //para cargar jugadores distintos al local.
+          const remotePlayer = this.displayPlayers(players[id], "player"); //para cargar jugadores distintos al local.
+          players[remotePlayer.playerId] = remotePlayer;
+
         }
       });
     });
 
     this.socket.on("newPlayer", playerInfo => {
-      this.displayPlayers.bind(this)(playerInfo, "player");
+      const newPlayer = this.displayPlayers.bind(this)(playerInfo, "player");
+      players[newPlayer.playerId] = newPlayer;
     });
 
     this.socket.on("disconnect", playerId => {
@@ -91,8 +93,11 @@ class MainScene extends Phaser.Scene {
     });
 
     this.socket.on("playersUpdate",playersStates => {
-      playersStates.forEach(state => {
+      Object.values(playersStates).forEach(state => {
+
         if (players[state.playerId] != null) {
+      console.log(Object.values(players[state.playerId]))
+
           players[state.playerId].remoteState = state;
           players[state.playerId].validateState()        
         }
@@ -117,6 +122,11 @@ class MainScene extends Phaser.Scene {
     if (localPlayer != null) {
       localPlayer.update(input);
     }
+    Object.keys(players).forEach(playerId => {
+      const player = players[playerId];
+      console.log(player)
+      player.validateState();
+    })
 
     if (
       savedInput.left !== input.left ||

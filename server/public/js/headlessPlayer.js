@@ -21,6 +21,7 @@
     }
   
     update(input) {
+      if (!input || input == null || input == undefined) return;
       var grounded = this.body.touching.down;
       this.grounded = grounded;
       var velocityX = 0;

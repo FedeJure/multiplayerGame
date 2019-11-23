@@ -110,6 +110,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   update(input) {
+    if (!input || input == null || input == undefined) return;
     var grounded = this.body.touching.down;
     var velocityX = 0;
 
@@ -173,19 +174,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
   validateState() {
     const state = this.remoteState;
-    const precisionPosition = 100;
-    const precisionVelocity = 100;
-    if (
-      Math.abs(state.x - this.x) > precisionPosition ||
-      Math.abs(state.y - this.y) > precisionPosition ||
-      state.side != this.side
-    ) {
-      console.log(state,this);
-      this.setVelocityX(state.velocityX);
-      this.setVelocityY(state.velocityY);
-      this.side = state.side;
-      this.x = state.x;
-      this.y = state.y;
-    }
+
+    if (state == null || !state || state == undefined) return;
+    this.setVelocityX(state.velocityX);
+    this.setVelocityY(state.velocityY);
+    this.side = state.side;
+    this.x = state.x;
+    this.y = state.y;
   }
 }

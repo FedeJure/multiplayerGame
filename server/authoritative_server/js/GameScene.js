@@ -35,84 +35,21 @@ class GameScene extends Phaser.Scene {
       });
 
       socket.on("playerInput", inputData => {
-        this.handlePlayerInput(socket.id, inputData);
+        //this.handlePlayerInput(socket.id, inputData);
+        players[socket.id].input = inputData;
       });
     });
 
   }
 
   update(time, delta) {
-    /*this.players.getChildren().forEach(player => {
-      const playerModel = players[player.playerId];
-      const input = playerModel.input;
-      var grounded = player.body.touching.down;
-      var velocityX = 0;
-
-
-      var left = () => (velocityX -= 300);
-      var right = () => (velocityX += 300);
-
-      if (!input.didJump) {
-        playerModel.canJump = true;
-      }
-      if (!grounded) {
-        velocityX = player.body.velocity.x;
-      }
-      if (input.left && grounded) {
-        left();
-        this.setAnim(playerModel, "walk");
-        playerModel.side = SIDE.left;
-      }
-      if (input.right && grounded) {
-        right();
-        this.setAnim(playerModel, "walk");
-        playerModel.side = SIDE.right;
-      }
-      if (
-        playerModel.jumps > 0 &&
-        input.up &&
-        input.didJump &&
-        playerModel.canJump
-      ) {
-        if (input.left && !grounded) {
-          velocityX = -300;
-          playerModel.side = SIDE.left;
-        }
-        if (input.right && !grounded) {
-          velocityX = 300;
-          playerModel.side = SIDE.right;
-        }
-        player.setVelocityY(-500);
-        playerModel.jumps -= 1;
-        this.setAnim(playerModel, "jump");
-        playerModel.canJump = false;
-      }
-      if (grounded && !input.didJump) {
-        playerModel.restartJumps();
-      }
-      if (!input.left && !input.right && grounded)
-        this.setAnim(playerModel, "idle");
-      player.setVelocityX(velocityX);
-      if (grounded && input.attack1 && !playerModel.onAction) {
-        //attack
-        this.setAnim(playerModel, playerModel.attacks.attack1.anim);
-        playerModel.onAction = true;
-        setTimeout(() => {
-          playerModel.onAction = false;
-        }, playerModel.attacks.attack1.duration);
-      }
-      //console.log("PLAYER POSITION: X:",player.x," Y: ",player.y);
-      playerModel.x = player.x;
-      playerModel.y = player.y;
-      playerModel.velocityX = player.body.velocity.x;
-      playerModel.velocityY = player.body.velocity.y;
-      playerModel.grounded = grounded;
-      playerModel.rotation = player.rotation;
-    });
-    //this.physics.world.wrap(this.players, -1);
-    io.emit("playerUpdates", players);*/
-
-    io.emit("playersUpdate", Object.values(players).map(player => player.getRepresentation()));
+    const toSend = {};
+    Object.keys(players).forEach(key => {
+      const player = players[key];
+      player.update(player.input);
+      toSend[key] = player.getRepresentation();
+    })
+    io.emit("playersUpdate", toSend);
   }
 
   addPlayer(id, x, y, name) {
@@ -129,11 +66,8 @@ class GameScene extends Phaser.Scene {
   }
 
   removePlayer(playerId) {
-    this.players.getChildren().forEach(player => {
-      if (playerId === player.playerId) {
-        player.destroy();
-      }
-    });
+    players[playerId].destroy();
+    delete players[playerId];
     window.URL.createObjectURL = blob => {
       if (blob) {
         return datauri.format(
@@ -145,10 +79,10 @@ class GameScene extends Phaser.Scene {
     window.URL.revokeObjectURL = objectURL => {};
   }
 
-  handlePlayerInput(playerId, input) {
-    players[playerId].update(input)
-    io.emit("playerUpdates", players[playerId].getRepresentation());
-  }
+  // handlePlayerInput(playerId, input) {
+  //   players[playerId].update(input)
+  //   io.emit("playerUpdates", players[playerId].getRepresentation());
+  // }
 
   createTerrain() {
     const background = this.add.image(1250, 300, "background");
