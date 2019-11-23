@@ -48,37 +48,21 @@ class MainScene extends Phaser.Scene {
   }
 
   create() {
-    this.socket = io();
+    this.socket = io({query: {
+      name: localStorage.getItem("playerName")
+    }});
     this.cameras.main.setBackgroundColor("#ccccff");
 
-    this.socket.on("connectionSuccess", (id) => {
-      localId = id;
-      this.socket.emit("setPlayerName",{id: id, name: localStorage.getItem("playerName")});
-    });
-   /* this.socket.on("currentPlayers", currentPlayers => {
-      console.log(currentPlayers);
-      Object.values(currentPlayers).forEach(player => {
-        if (player.playerId === this.socket.id) {
-          //his.cameras.main.setBounds(-700, 300, 3000, 0);
-          const createdPlayer = this.displayPlayers(player, "player");
-          this.cameras.main.startFollow(
-            createdPlayer
-          );
-          this.cameras.main.zoom = 1;
-          createdPlayer.setIsLocalPlayer();
-          localPlayer = createdPlayer;
-        } else {
-          const remotePlayer = this.displayPlayers(player, "player"); //para cargar jugadores distintos al local.
-          players[remotePlayer.playerId] = remotePlayer;
-
-        }
-      });
-    });*/
-/*
-    this.socket.on("newPlayer", playerInfo => {
-      const newPlayer = this.displayPlayers.bind(this)(playerInfo, "player");
+    this.socket.on("connectionSuccess", playerState => {
+      const newPlayer = this.displayPlayers(playerState);
+      this.cameras.main.startFollow(
+        newPlayer
+      );
+      this.cameras.main.zoom = 1;
+      newPlayer.setIsLocalPlayer();
+      localPlayer = newPlayer;
       players[newPlayer.playerId] = newPlayer;
-    });*/
+    });
 
     this.socket.on("disconnect", playerId => {
       Object.keys(players).forEach(id => {
@@ -91,17 +75,7 @@ class MainScene extends Phaser.Scene {
 
     this.socket.on("playersUpdate",playersStates => {
       Object.values(playersStates).forEach(playerState => {
-        if (players[playerState.playerId] == null && localId == playerState.playerId) {
-          const newPlayer = this.displayPlayers(playerState);
-          this.cameras.main.startFollow(
-            newPlayer
-          );
-          this.cameras.main.zoom = 1;
-          newPlayer.setIsLocalPlayer();
-          localPlayer = newPlayer;
-          players[newPlayer.playerId] = newPlayer;
-        }
-        else if (players[playerState.playerId] == null) {
+        if (players[playerState.playerId] == null) {
           const newPlayer = this.displayPlayers(playerState);
           players[newPlayer.playerId] = newPlayer;
         }
@@ -126,11 +100,9 @@ class MainScene extends Phaser.Scene {
       didJump : !savedInput.up && this.controls.jump.isDown,
       attack1KeyPressed : this.controls.attack1.isDown,
     }
-    if (localPlayer != null) {
-      localPlayer.update(input);
-    }
+    localPlayer.update(input);
     Object.keys(players).forEach(playerId => {
-      if (playerId != localPlayer.plauerId) {
+      if (playerId != localPlayer.playerId) {
         const player = players[playerId]; 
         player.validateState();
       }

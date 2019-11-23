@@ -13,6 +13,7 @@
       this.jumps = initialJumps;
       this.side = SIDE.right;
       this.anim = "idle";
+      this.name = name
     }
   
     updateState(playerInfo) {

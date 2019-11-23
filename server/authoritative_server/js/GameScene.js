@@ -16,10 +16,8 @@ class GameScene extends Phaser.Scene {
     this.createTerrain();
     this.initPlatforms();
     io.on("connection", socket => {
-      //players[socket.id] = CreatePlayer(socket.id, 0, 30,socket.name);
-      this.addPlayer(socket.id, 0, 30,socket.name);
-      
-      socket.emit("connectionSuccess",socket.id);
+      this.addPlayer(socket.id, 0, 30,socket.handshake.query.name);
+      socket.emit("connectionSuccess",players[socket.id].getRepresentation());
 
 
       socket.on("disconnect", () => {
@@ -27,19 +25,7 @@ class GameScene extends Phaser.Scene {
         delete players[socket.id];
         io.emit("disconnect", socket.id);
       });
-
-      socket.on("setPlayerName", ({id, name}) => {
-        players[id].name = name;
-        /*const toSend = {};
-        Object.values(players).forEach(player => {
-          toSend[player.playerId] = player.getRepresentation();
-        })*/
-        //socket.emit("currentPlayers",toSend);
-        //socket.broadcast.emit("updateLocalName",name);
-      });
-
       socket.on("playerInput", inputData => {
-        //this.handlePlayerInput(socket.id, inputData);
         players[socket.id].input = inputData;
       });
     });
