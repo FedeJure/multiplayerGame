@@ -30,8 +30,12 @@ class GameScene extends Phaser.Scene {
 
       socket.on("setPlayerName", ({id, name}) => {
         players[id].name = name;
-        socket.emit("currentPlayers",Object.values(players).map(player => player.getRepresentation()) );
-        socket.broadcast.emit("newPlayer", players[socket.id].getRepresentation());
+        /*const toSend = {};
+        Object.values(players).forEach(player => {
+          toSend[player.playerId] = player.getRepresentation();
+        })*/
+        //socket.emit("currentPlayers",toSend);
+        //socket.broadcast.emit("updateLocalName",name);
       });
 
       socket.on("playerInput", inputData => {
@@ -78,11 +82,6 @@ class GameScene extends Phaser.Scene {
     };
     window.URL.revokeObjectURL = objectURL => {};
   }
-
-  // handlePlayerInput(playerId, input) {
-  //   players[playerId].update(input)
-  //   io.emit("playerUpdates", players[playerId].getRepresentation());
-  // }
 
   createTerrain() {
     const background = this.add.image(1250, 300, "background");

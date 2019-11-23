@@ -12,6 +12,7 @@
       this.scaleY = 1;
       this.jumps = initialJumps;
       this.side = SIDE.right;
+      this.anim = "idle";
     }
   
     updateState(playerInfo) {
@@ -37,10 +38,12 @@
       }
       if (input.left && grounded) {
         left();
+        this.anim = "walk";
         this.side = SIDE.left;
       }
       if (input.right && grounded) {
         right();
+        this.anim = "walk";
         this.side = SIDE.right;
       }
       if (this.jumps > 0 && input.up && input.didJump && this.canJump) {
@@ -54,18 +57,21 @@
         }
         this.body.setVelocityY(-500);
         this.jumps -= 1;
+        this.anim = "jump";
         this.canJump = false;
       }
       if (grounded && !input.didJump) {
         this.restartJumps();
       }
+    if (!input.left && !input.right && grounded) this.anim = "idle";      
       this.body.setVelocityX(velocityX);
       if (grounded && input.attack1 && !this.onAction) {
         //attack
+        this.anim = "attack1";
         this.onAction = true;
         setTimeout(() => {
           this.onAction = false;
-        }, 500 /*this.attacks.attack1.duration*/);
+        }, 500);
       }
     }
 
@@ -84,6 +90,9 @@
             jumps: this.jumps,
             grounded: this.grounded,
             playerId: this.playerId,
+            onAction: this.onAction,
+            anim: this.anim,
+            name: this.name
         }
     }
   }

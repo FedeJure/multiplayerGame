@@ -6,6 +6,7 @@ let savedInput = {
   attack1KeyPressed: false
 };
 let localPlayer = null;
+let localId = null;
 class MainScene extends Phaser.Scene {
 
   constructor() {
@@ -51,15 +52,15 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor("#ccccff");
 
     this.socket.on("connectionSuccess", (id) => {
+      localId = id;
       this.socket.emit("setPlayerName",{id: id, name: localStorage.getItem("playerName")});
     });
-
-    this.socket.on("currentPlayers", players => {
-      console.log(players)
-      Object.keys(players).forEach(id => {
-        if (players[id].playerId === this.socket.id) {
+   /* this.socket.on("currentPlayers", currentPlayers => {
+      console.log(currentPlayers);
+      Object.values(currentPlayers).forEach(player => {
+        if (player.playerId === this.socket.id) {
           //his.cameras.main.setBounds(-700, 300, 3000, 0);
-          const createdPlayer = this.displayPlayers(players[id], "player");
+          const createdPlayer = this.displayPlayers(player, "player");
           this.cameras.main.startFollow(
             createdPlayer
           );
@@ -67,42 +68,45 @@ class MainScene extends Phaser.Scene {
           createdPlayer.setIsLocalPlayer();
           localPlayer = createdPlayer;
         } else {
-          const remotePlayer = this.displayPlayers(players[id], "player"); //para cargar jugadores distintos al local.
+          const remotePlayer = this.displayPlayers(player, "player"); //para cargar jugadores distintos al local.
           players[remotePlayer.playerId] = remotePlayer;
 
         }
       });
-    });
-
+    });*/
+/*
     this.socket.on("newPlayer", playerInfo => {
       const newPlayer = this.displayPlayers.bind(this)(playerInfo, "player");
       players[newPlayer.playerId] = newPlayer;
-    });
+    });*/
 
     this.socket.on("disconnect", playerId => {
       Object.keys(players).forEach(id => {
         if (playerId === players[id].playerId) {
           players[id].destroy();
+          delete players[id];
         }
       });
     });
 
-    this.socket.on("playerUpdates", playerState => {
-      if (players[playerState.playerId] != null)
-        players[playerState.playerId].remoteState = playerState;
-    });
-
     this.socket.on("playersUpdate",playersStates => {
-      Object.values(playersStates).forEach(state => {
-
-        if (players[state.playerId] != null) {
-      console.log(Object.values(players[state.playerId]))
-
-          players[state.playerId].remoteState = state;
-          players[state.playerId].validateState()        
+      Object.values(playersStates).forEach(playerState => {
+        if (players[playerState.playerId] == null && localId == playerState.playerId) {
+          const newPlayer = this.displayPlayers(playerState);
+          this.cameras.main.startFollow(
+            newPlayer
+          );
+          this.cameras.main.zoom = 1;
+          newPlayer.setIsLocalPlayer();
+          localPlayer = newPlayer;
+          players[newPlayer.playerId] = newPlayer;
         }
-      })
-
+        else if (players[playerState.playerId] == null) {
+          const newPlayer = this.displayPlayers(playerState);
+          players[newPlayer.playerId] = newPlayer;
+        }
+        players[playerState.playerId].remoteState = playerState;
+      });
     })
 
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -112,6 +116,9 @@ class MainScene extends Phaser.Scene {
   }
 
   update() {
+    if (localPlayer == null || localPlayer == undefined) {
+      return;
+    }
     const input = {
       left : this.controls.left.isDown,
       right : this.controls.right.isDown,
@@ -123,9 +130,11 @@ class MainScene extends Phaser.Scene {
       localPlayer.update(input);
     }
     Object.keys(players).forEach(playerId => {
-      const player = players[playerId];
-      console.log(player)
-      player.validateState();
+      if (playerId != localPlayer.plauerId) {
+        const player = players[playerId]; 
+        player.validateState();
+      }
+
     })
 
     if (

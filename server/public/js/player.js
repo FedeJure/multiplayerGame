@@ -38,7 +38,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.scaleX = 1;
     this.scaleY = 1;
     this.anims.play("idle");
-    this.name = scene.add.text(0, 0, name, {
+    this.name =  scene.add.text(0, 0, name, {
       fontFamily: '"Roboto Condensed"'
     });
     this.canAnimate = true;
@@ -48,6 +48,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.isLocalPlayer = false;
     this.jumps = initialJumps;
     this.side = SIDE.right;
+  }
+
+  setName(name) {
+    this.name.text = name
   }
 
 
@@ -181,5 +185,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.side = state.side;
     this.x = state.x;
     this.y = state.y;
+    this.onAction = state.onAction;
+    this.setAnim(state.anim);
+    this.updatePlayerName();
+
   }
 }
