@@ -1,13 +1,13 @@
 const config = {
   type: Phaser.AUTO,
-  parent: 'phaser-example',
+  parent: 'gameZone',
   width: 800,
   height: 600,
   autoFocus: false,
   physics: {
     default: 'arcade',
     arcade: {
-      debug: false,
+      debug: true,
       gravity: { y: 2000 }
     }
   },

@@ -1,0 +1,25 @@
+.game {
+    background-color: lightblue;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-flow: column;
+    align-content: center;
+}
+
+.gameZone {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.buttonContainer {
+    display: none;
+}
+
+@media only screen and (max-width: 550px) {
+    .buttonContainer {
+        display: flex;
+    }
+  }

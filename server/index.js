@@ -11,7 +11,6 @@ const { JSDOM } = jsdom;
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', function (req, res) {
-  console.log("asfasfasfasfasf")
   res.sendFile(__dirname + '/index.html');
 });
 

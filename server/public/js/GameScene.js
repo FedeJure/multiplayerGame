@@ -55,10 +55,9 @@ class MainScene extends Phaser.Scene {
 
     this.socket.on("connectionSuccess", playerState => {
       const newPlayer = this.displayPlayers(playerState);
-      this.cameras.main.startFollow(
-        newPlayer
-      );
+      this.cameras.main.startFollow(newPlayer);
       this.cameras.main.zoom = 1;
+      this.cameras.main.setBounds(-10000,-10000,1000000, 10600)
       newPlayer.setIsLocalPlayer();
       localPlayer = newPlayer;
       players[newPlayer.playerId] = newPlayer;
