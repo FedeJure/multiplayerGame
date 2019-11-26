@@ -168,7 +168,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
   validateState() {
     const state = this.remoteState;
-    console.log("asasdasd")
     if (state == null || !state || state == undefined) return;
     this.setVelocityX(state.velocityX);
     this.setVelocityY(state.velocityY);

@@ -17,7 +17,6 @@ class MainScene extends Phaser.Scene {
 
   displayPlayers(playerInfo, sprite) {
     const player = new Player(this, playerInfo.x, playerInfo.y, playerInfo.name, playerInfo.playerId,this.controls);
-    console.log(player)
     this.physics.add.existing(player); 
     this.add.existing(player);
     player.setDrag(100);
@@ -87,7 +86,7 @@ class MainScene extends Phaser.Scene {
 
     this.createTerrain();
     this.initPlatforms();
-    console.log(new Chat(this))
+    new Chat(this)
   }
 
   update() {

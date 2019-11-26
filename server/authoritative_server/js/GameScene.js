@@ -1,5 +1,5 @@
 const players = {};
-
+const chatController = new RemoteChatController();
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: "gameScene" });
@@ -16,9 +16,10 @@ class GameScene extends Phaser.Scene {
     this.createTerrain();
     this.initPlatforms();
     io.on("connection", socket => {
-      this.addPlayer(socket.id, 0, 30,socket.handshake.query.name);
-      socket.emit("connectionSuccess",players[socket.id].getRepresentation());
+      this.addPlayer(socket.id, 0, 30, socket.handshake.query.name);
+      socket.emit("connectionSuccess", players[socket.id].getRepresentation());
 
+      chatController.addToChatRoom(socket);
 
       socket.on("disconnect", () => {
         this.removePlayer(socket.id);
@@ -29,6 +30,7 @@ class GameScene extends Phaser.Scene {
         players[socket.id].input = inputData;
       });
     });
+    new RemoteChatController();
 
   }
 
@@ -45,7 +47,7 @@ class GameScene extends Phaser.Scene {
   addPlayer(id, x, y, name) {
 
     const player = new HeadlessPlayer(this, x, y, name, id, this.controls);
-    this.physics.add.existing(player); 
+    this.physics.add.existing(player);
     this.add.existing(player);
     player.setDrag(100);
     player.setAngularDrag(100);
@@ -66,7 +68,7 @@ class GameScene extends Phaser.Scene {
         ).content;
       }
     };
-    window.URL.revokeObjectURL = objectURL => {};
+    window.URL.revokeObjectURL = objectURL => { };
   }
 
   createTerrain() {
@@ -96,6 +98,6 @@ class GameScene extends Phaser.Scene {
         100
       ),
       new Phaser.GameObjects.Rectangle(this, 2000, platformY, 10, 1000, 0, 10)
-    ]);  
+    ]);
   }
 }

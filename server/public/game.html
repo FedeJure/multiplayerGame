@@ -9,7 +9,7 @@
 
 <body class="game">
     <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.21.0/dist/phaser.min.js"></script>
     <script src="lib/phaser-ui-tools.min.js"></script>
     <script src="js/chatController.js"></script>
     <script src="js/player.js"></script>
@@ -24,8 +24,9 @@
         </div>
     </div>
 
-    <div id="chat" class="chatContainer">
-        <form action="">
+    <div id="chat" class="closeChat chatContainer" >
+        <form action="" id="chatForm">
+            <!--
             <div class="messageContainer">
                 <div class="remote-message">
                     <p class="messageSender"><b>Otro:</b></p>
@@ -36,8 +37,10 @@
                     <p>Todo bien, y vos?</p>
                 </div>   
             </div>
+             -->
 
-            <input type="text" placeholder="chat..." class="chatInput">
+
+            <input name="input" type="text" placeholder="chat..." class="chatInput">
         </form>
     </div>
 
