@@ -8,6 +8,12 @@
     align-content: center;
 }
 
+.gameContainer {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
 .gameZone {
     display: flex;
     justify-content: center;
@@ -22,4 +28,71 @@
     .buttonContainer {
         display: flex;
     }
-  }
+
+    .gameContainer {
+        flex-flow: column;
+    }
+}
+
+.chatContainer {
+    position: fixed;
+    display: flex;
+    background-color: rgba(240, 248, 255, 0.411);
+    width: 20%;
+    height: 50%;
+    z-index: 2;
+    bottom: 0;
+    right: 0;;
+}
+
+.chatContainer .remote-message {
+    display: flex;
+    flex-flow: column;
+    margin: 5%;
+    padding: 5%;
+    max-width: 60%;
+    margin-left: 30%;
+    background-color:rgba(127, 255, 212, 0.5);
+}
+
+.chatContainer form {
+    width: 100%;
+}
+
+.chatContainer .local-message {
+    display: flex;
+    flex-flow: column;    
+    margin: 5%;
+    padding: 5%;
+    max-width: 60%;
+    background-color:rgba(255, 195, 127, 0.5);
+}
+
+.chatContainer .remote-message p {
+    height: fit-content;
+    margin: 0;
+}
+
+.chatContainer .local-message p {
+    height: fit-content;
+    margin: 0;
+}
+
+.chatContainer .local-message messageSender {
+    margin: 10px;
+    align-content: center;
+}
+
+
+.chatContainer .remote-message messageSender {
+    margin: 10px;
+}
+
+.chatContainer .chatInput {
+    bottom:  0;
+    width: 98%;
+}
+
+.chatContainer .messageContainer {
+    height: 90%;
+}

@@ -15,11 +15,31 @@
     <script src="js/GameScene.js"></script>
     <script src="js/game.js"></script>
 
-    <div id="gameZone" class="gameZone"> </div>
-    <div class="buttonContainer">
-        <button>Izquierda</button>
-        <button>Derecha</button>
+    <div class="gameContainer">
+        <div id="gameZone" class="gameZone"> </div>
+        <div class="buttonContainer">
+            <button>Izquierda</button>
+            <button>Derecha</button>
+        </div>
     </div>
+
+    <div class="chatContainer">
+        <form action="">
+            <div class="messageContainer">
+                <div class="remote-message">
+                    <p class="messageSender"><b>Otro:</b></p>
+                    <p>Hola, como estas?</p>
+                </div>
+                <div class="local-message">
+                    <p class="messageSender"><b>Fede:</b></p>                                            
+                    <p>Todo bien, y vos?</p>
+                </div>   
+            </div>
+
+            <input type="text" placeholder="chat..." class="chatInput">
+        </form>
+    </div>
+
 
 </body>
 
