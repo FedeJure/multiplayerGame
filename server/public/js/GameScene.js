@@ -7,6 +7,7 @@ let savedInput = {
 };
 let localPlayer = null;
 let localId = null;
+let socket = null;
 class MainScene extends Phaser.Scene {
 
   constructor() {
@@ -48,12 +49,12 @@ class MainScene extends Phaser.Scene {
   }
 
   create() {
-    this.socket = io({query: {
+    socket = io({query: {
       name: localStorage.getItem("playerName")
     }});
     this.cameras.main.setBackgroundColor("#ccccff");
 
-    this.socket.on("connectionSuccess", playerState => {
+    socket.on("connectionSuccess", playerState => {
       const newPlayer = this.displayPlayers(playerState);
       this.cameras.main.startFollow(newPlayer);
       this.cameras.main.zoom = 1;
@@ -63,7 +64,7 @@ class MainScene extends Phaser.Scene {
       players[newPlayer.playerId] = newPlayer;
     });
 
-    this.socket.on("disconnect", playerId => {
+    socket.on("disconnect", playerId => {
       Object.keys(players).forEach(id => {
         if (playerId === players[id].playerId) {
           players[id].destroy();
@@ -72,7 +73,7 @@ class MainScene extends Phaser.Scene {
       });
     });
 
-    this.socket.on("playersUpdate",playersStates => {
+    socket.on("playersUpdate",playersStates => {
       Object.values(playersStates).forEach(playerState => {
         if (players[playerState.playerId] == null) {
           const newPlayer = this.displayPlayers(playerState);
@@ -86,6 +87,7 @@ class MainScene extends Phaser.Scene {
 
     this.createTerrain();
     this.initPlatforms();
+    console.log(new Chat(this))
   }
 
   update() {
@@ -114,7 +116,7 @@ class MainScene extends Phaser.Scene {
       savedInput.up !== input.up ||
       savedInput.attack1 !== input.attack1
     ) {
-      this.socket.emit("playerInput", input);
+      socket.emit("playerInput", input);
     }
     savedInput = {...input};
     if (this.controls.lag.isDown) {
