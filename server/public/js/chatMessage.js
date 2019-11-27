@@ -33,6 +33,7 @@ class ChatMessage extends Phaser.GameObjects.Container {
     setText(text) {
         window.clearTimeout(this.timeoutHandle);
         this.message.text = text;
+        console.log(this.message.text,this.message.text,this.message.text,this.message.text)
         this.active = true;
         console.log(this.message, this.box)
         this.box.setSize(this.message.width * 1.1, this.message.height * 1.1);

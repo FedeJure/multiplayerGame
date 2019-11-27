@@ -45,7 +45,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.on("animationcomplete", key => {
       if (!this.canAnimate) this.canAnimate = true;
     });
-    this.isLocalPlayer = false;
+    this.localPlayer = false;
     this.jumps = initialJumps;
     this.side = SIDE.right;
     this.chatMessage = new ChatMessage(this.scene, this, "");
@@ -103,6 +103,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   setMessage(text) {
+    console.log(this.playerId, text);
     this.chatMessage.setText(text);
   }
 
@@ -177,13 +178,21 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.jumps = initialJumps;
   }
 
-  updateRemoteState(state) {
-      this.remoteState = state;
-  }
-
+    updateRemoteState(state) {
+      if ((JSON.stringify(this.remoteState) != JSON.stringify(state)) ) {
+        if (!this.isLocalPlayer && (Math.abs(this.remoteState.x - state.x) > 5 ||
+        Math.abs(this.remoteState.y - state.y) > 5)) {
+          this.timeValidatePosition();
+          this.validating = true;
+        }
+        this.remoteState = state;
+      }
+    }
   timeValidatePosition() {
+    if (this.validating) return;
     setTimeout(() => {
       this.validatePosition();
+      this.validating = false;
     }, 1000);
   }
 
