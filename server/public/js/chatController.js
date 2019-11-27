@@ -21,8 +21,6 @@ class Chat {
     })
 
     chatForm.addEventListener("submit", this.onChatSubmit)
-    
-
   }
 
   openClose() {

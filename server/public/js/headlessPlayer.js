@@ -76,12 +76,12 @@
         }, 500);
       }
 
-      if (this.lastState &&
+      /*if (this.lastState &&
           (Math.abs(this.lastState.x - this.x) < 5 ||
           Math.abs(this.lastState.y - this.y) < 5 )) {
             this.x = this.lastState.x;
             this.y = this.lastState.y;
-          }
+          }*/
     }
 
   

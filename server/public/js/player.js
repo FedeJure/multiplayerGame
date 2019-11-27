@@ -103,12 +103,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   setMessage(text) {
-    console.log(this.playerId, text);
     this.chatMessage.setText(text);
   }
 
   destroy() {
     this.name.destroy();
+    this.chatMessage.destroy();
     super.destroy();
   }
 
@@ -192,7 +192,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       }
   }
 
-  validateState() {
+  validateState() {    
     const state = this.remoteState;
     this.updateChatMessage();
     if (state == null || !state || state == undefined) return;
@@ -203,6 +203,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.setAnim(state.anim);
     this.updatePlayerName();
     this.validatePosition()
+  }
+
+  validateLocalState() {
+    if (state == null || !state || state == undefined) return;
+    this.setVelocityX(state.velocityX);
+    this.setVelocityY(state.velocityY);
   }
 
   getRepresentation() {

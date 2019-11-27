@@ -54,31 +54,28 @@ class MainScene extends Phaser.Scene {
 
     socket.on("connectionSuccess", playerState => {
       const newPlayer = this.displayPlayers(playerState);
-      this.chat.addPlayer(newPlayer);
       this.cameras.main.startFollow(newPlayer);
       this.cameras.main.zoom = 1;
       this.cameras.main.setBounds(-10000,-10000,1000000, 10600)
       newPlayer.setIsLocalPlayer();
       localPlayer = newPlayer;
       players[newPlayer.playerId] = newPlayer;
+      this.chat.addPlayer(newPlayer);
+
     });
 
     socket.on("disconnect", playerId => {
-      Object.keys(players).forEach(id => {
-        if (playerId === players[id].playerId) {
-          players[id].destroy();
-          delete players[id];
-          this.chat.removePlayer(playerId);
-        }
-      });
+      players[playerId].destroy();
+      delete players[playerId];
+      this.chat.removePlayer(playerId);
     });
 
     socket.on("playersUpdate",playersStates => {
       Object.values(playersStates).forEach(playerState => {
         if (players[playerState.playerId] == null) {
           const newPlayer = this.displayPlayers(playerState);
-          this.chat.addPlayer(newPlayer);
           players[newPlayer.playerId] = newPlayer;
+          this.chat.addPlayer(newPlayer);
         }
         players[playerState.playerId].updateRemoteState(playerState);
       });
