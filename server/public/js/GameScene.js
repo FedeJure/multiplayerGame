@@ -100,26 +100,24 @@ class MainScene extends Phaser.Scene {
       right : this.controls.right.isDown,
       up : this.controls.jump.isDown,
       didJump : !savedInput.up && this.controls.jump.isDown,
-      attack1KeyPressed : this.controls.attack1.isDown,
+      attack1 : this.controls.attack1.isDown,
     }
     localPlayer.update(input);
+    // if (
+    //   savedInput.left !== input.left ||
+    //   savedInput.right !== input.right ||
+    //   savedInput.up !== input.up ||
+    //   savedInput.didJump !== input.didJump ||
+    //   savedInput.attack1 !== input.attack1
+    // ) {
+      socket.emit("playerInput", {input, state: localPlayer.getRepresentation()});
+      savedInput = {...input};
+    // }
     Object.keys(players).forEach(playerId => {
       if (playerId != localPlayer.playerId) {
-        const player = players[playerId]; 
-        player.validateState();
+        players[playerId].validateState(); 
       }
-
     })
-
-    if (
-      savedInput.left !== input.left ||
-      savedInput.right !== input.right ||
-      savedInput.up !== input.up ||
-      savedInput.attack1 !== input.attack1
-    ) {
-      socket.emit("playerInput", input);
-    }
-    savedInput = {...input};
     if (this.controls.lag.isDown) {
       localPlayer.validatePosition();
     }

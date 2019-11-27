@@ -204,4 +204,11 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.updatePlayerName();
     this.validatePosition()
   }
+
+  getRepresentation() {
+    return {
+      x: this.x,
+      y: this.y
+    }
+  }
 }

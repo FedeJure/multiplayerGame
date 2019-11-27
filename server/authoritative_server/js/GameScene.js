@@ -26,8 +26,9 @@ class GameScene extends Phaser.Scene {
         delete players[socket.id];
         io.emit("disconnect", socket.id);
       });
-      socket.on("playerInput", inputData => {
-        players[socket.id].input = inputData;
+      socket.on("playerInput", ({input, state}) => {
+        players[socket.id].input = input;
+        players[socket.id].lastState = state;
       });
     });
     
@@ -38,7 +39,7 @@ class GameScene extends Phaser.Scene {
     const toSend = {};
     Object.keys(players).forEach(key => {
       const player = players[key];
-      player.update(player.input);
+      player.update();
       toSend[key] = player.getRepresentation();
     })
     io.emit("playersUpdate", toSend);

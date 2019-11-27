@@ -22,7 +22,8 @@
         this.updatePlayerName();
     }
   
-    update(input) {
+    update() {
+      const input = this.input;
       if (!input || input == null || input == undefined) return;
       var grounded = this.body.touching.down;
       this.grounded = grounded;
@@ -64,7 +65,7 @@
       if (grounded && !input.didJump) {
         this.restartJumps();
       }
-    if (!input.left && !input.right && grounded) this.anim = "idle";      
+      if (!input.left && !input.right && grounded) this.anim = "idle";      
       this.body.setVelocityX(velocityX);
       if (grounded && input.attack1 && !this.onAction) {
         //attack
@@ -74,6 +75,13 @@
           this.onAction = false;
         }, 500);
       }
+
+      if (this.lastState &&
+          (Math.abs(this.lastState.x - this.x) < 5 ||
+          Math.abs(this.lastState.y - this.y) < 5 )) {
+            this.x = this.lastState.x;
+            this.y = this.lastState.y;
+          }
     }
 
   
