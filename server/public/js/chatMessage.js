@@ -18,10 +18,9 @@ class ChatMessage extends Phaser.GameObjects.Container {
         
         scene.add.existing(this);
         this.parent = parent;
-        setTimeout(() => {
-            this.destroy();
-        }, 5000);
         this.box = box;
+        this.message = message;
+        this.timeoutHandle = null;
     }
 
     update() {
@@ -29,5 +28,17 @@ class ChatMessage extends Phaser.GameObjects.Container {
             this.parent.body.position.x + this.parent.width,
             this.parent.body.position.y - this.parent.body.height - (13 * (this.box.height / 13)) - 10
         );
+    }
+
+    setText(text) {
+        window.clearTimeout(this.timeoutHandle);
+        this.message.text = text;
+        this.active = true;
+        this.box.setSize(this.message.width * 1.1, this.message.height * 1.1);
+        this.timeoutHandle = setTimeout(() => {
+            this.active = false;
+            this.message.text = "";
+            this.box.setSize(0,0);
+        }, 5000);
     }
 }

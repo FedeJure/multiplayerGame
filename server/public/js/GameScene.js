@@ -68,6 +68,7 @@ class MainScene extends Phaser.Scene {
         if (playerId === players[id].playerId) {
           players[id].destroy();
           delete players[id];
+          this.chat.removePlayer(playerId);
         }
       });
     });
@@ -79,7 +80,7 @@ class MainScene extends Phaser.Scene {
           this.chat.addPlayer(newPlayer);
           players[newPlayer.playerId] = newPlayer;
         }
-        players[playerState.playerId].remoteState = playerState;
+        players[playerState.playerId].updateRemoteState(playerState);
       });
     })
 
@@ -120,7 +121,7 @@ class MainScene extends Phaser.Scene {
     }
     savedInput = {...input};
     if (this.controls.lag.isDown) {
-      localPlayer.validateState()
+      localPlayer.validatePosition();
     }
   }
 

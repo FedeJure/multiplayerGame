@@ -30,7 +30,7 @@ class GameScene extends Phaser.Scene {
         players[socket.id].input = inputData;
       });
     });
-    new RemoteChatController();
+    
 
   }
 

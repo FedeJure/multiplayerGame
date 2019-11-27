@@ -17,7 +17,8 @@ class Chat {
     chatForm = document.getElementById("chatForm");
     this.players = {};
     socket.on("message", ({ senderId, message }) => {
-      this.players[senderId].setMessage(message)
+
+      this.players[senderId].setMessage(message);
     })
 
     chatForm.addEventListener("submit", this.onChatSubmit)
@@ -63,5 +64,9 @@ class Chat {
 
   addPlayer(player){
     this.players[player.playerId] = player;
+  }
+
+  removePlayer(playerId) {
+    delete this.players[playerId];
   }
 }

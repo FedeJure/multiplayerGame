@@ -38,7 +38,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.scaleX = 1;
     this.scaleY = 1;
     this.anims.play("idle");
-    this.name =  scene.add.text(0, 0, name, {
+    this.name = scene.add.text(0, 0, name, {
       fontFamily: '"Roboto Condensed"'
     });
     this.canAnimate = true;
@@ -48,7 +48,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.isLocalPlayer = false;
     this.jumps = initialJumps;
     this.side = SIDE.right;
-    this.chatMessage = new ChatMessage(scene, this)
+    this.chatMessage = new ChatMessage(this.scene, this, "");
+    this.timeValidatePosition();
   }
 
   setName(name) {
@@ -98,13 +99,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateChatMessage() {
-    if(this.chatMessage != null)
+    if (this.chatMessage != null)
       this.chatMessage.update();
   }
 
   setMessage(text) {
-    this.chatMessage = new ChatMessage(this.scene, this, text);
-    console.log(this.chatMessage)
+    this.chatMessage.setText(text);
   }
 
   destroy() {
@@ -178,14 +178,33 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.jumps = initialJumps;
   }
 
+  updateRemoteState(state) {
+    if ((JSON.stringify(this.remoteState) != JSON.stringify(state)) ) {
+      if (Math.abs(this.remoteState.x - state.x) > 2 || 
+      Math.abs(this.remoteState.y - state.y) > 2) {
+        this.timeValidatePosition();
+      }
+      this.remoteState = state;
+    }
+  }
+
+  timeValidatePosition() {
+    setTimeout(() => {
+      this.validatePosition();
+    }, 1000);
+  }
+
+  validatePosition() {
+    this.setPosition(this.remoteState.x, this.remoteState.y);
+  }
+
   validateState() {
     const state = this.remoteState;
+    this.updateChatMessage();
     if (state == null || !state || state == undefined) return;
     this.setVelocityX(state.velocityX);
     this.setVelocityY(state.velocityY);
     this.side = state.side;
-    this.x = state.x;
-    this.y = state.y;
     this.onAction = state.onAction;
     this.setAnim(state.anim);
     this.updatePlayerName();
