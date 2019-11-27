@@ -49,7 +49,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.jumps = initialJumps;
     this.side = SIDE.right;
     this.chatMessage = new ChatMessage(this.scene, this, "");
-    this.timeValidatePosition();
   }
 
   setName(name) {
@@ -179,13 +178,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateRemoteState(state) {
-    if ((JSON.stringify(this.remoteState) != JSON.stringify(state)) ) {
-      if (Math.abs(this.remoteState.x - state.x) > 2 || 
-      Math.abs(this.remoteState.y - state.y) > 2) {
-        this.timeValidatePosition();
-      }
       this.remoteState = state;
-    }
   }
 
   timeValidatePosition() {

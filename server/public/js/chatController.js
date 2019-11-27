@@ -17,7 +17,6 @@ class Chat {
     chatForm = document.getElementById("chatForm");
     this.players = {};
     socket.on("message", ({ senderId, message }) => {
-
       this.players[senderId].setMessage(message);
     })
 
