@@ -48,6 +48,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.isLocalPlayer = false;
     this.jumps = initialJumps;
     this.side = SIDE.right;
+    this.chatMessage = new ChatMessage(scene, this)
   }
 
   setName(name) {
@@ -94,6 +95,16 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       this.body.position.x,
       this.body.position.y - this.body.height * 0.5
     );
+  }
+
+  updateChatMessage() {
+    if(this.chatMessage != null)
+      this.chatMessage.update();
+  }
+
+  setMessage(text) {
+    this.chatMessage = new ChatMessage(this.scene, this, text);
+    console.log(this.chatMessage)
   }
 
   destroy() {
@@ -156,6 +167,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       }, 500 /*this.attacks.attack1.duration*/);
     }
     this.updatePlayerName();
+    this.updateChatMessage();
   }
 
   setAnim(anim) {

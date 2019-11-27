@@ -12,7 +12,6 @@ class MainScene extends Phaser.Scene {
 
   constructor() {
     super({ key: "MainGame", active: true });
-
   }
 
   displayPlayers(playerInfo, sprite) {
@@ -55,6 +54,7 @@ class MainScene extends Phaser.Scene {
 
     socket.on("connectionSuccess", playerState => {
       const newPlayer = this.displayPlayers(playerState);
+      this.chat.addPlayer(newPlayer);
       this.cameras.main.startFollow(newPlayer);
       this.cameras.main.zoom = 1;
       this.cameras.main.setBounds(-10000,-10000,1000000, 10600)
@@ -76,6 +76,7 @@ class MainScene extends Phaser.Scene {
       Object.values(playersStates).forEach(playerState => {
         if (players[playerState.playerId] == null) {
           const newPlayer = this.displayPlayers(playerState);
+          this.chat.addPlayer(newPlayer);
           players[newPlayer.playerId] = newPlayer;
         }
         players[playerState.playerId].remoteState = playerState;
@@ -86,7 +87,7 @@ class MainScene extends Phaser.Scene {
 
     this.createTerrain();
     this.initPlatforms();
-    new Chat(this)
+    this.chat = new Chat(this)
   }
 
   update() {

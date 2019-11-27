@@ -15,11 +15,14 @@ class Chat {
       }
     });
     chatForm = document.getElementById("chatForm");
-
+    this.players = {};
     socket.on("message", ({ senderId, message }) => {
+      this.players[senderId].setMessage(message)
     })
 
     chatForm.addEventListener("submit", this.onChatSubmit)
+    
+
   }
 
   openClose() {
@@ -48,10 +51,17 @@ class Chat {
     chatForm.children.input.blur();
     
     this.chatHtmlObject.classList.replace(openChatClass, closeChatClass);
+    this.sendMessage();
+  }
+  sendMessage() {
+    socket.emit("message", ({ senderId: socket.id, message: chatForm.children.input.value }));    
   }
 
   onChatSubmit(event) {
     event.preventDefault();
-    socket.emit("message", ({ senderId: socket.id, message: chatForm.children.input.value }));
+  }
+
+  addPlayer(player){
+    this.players[player.playerId] = player;
   }
 }
