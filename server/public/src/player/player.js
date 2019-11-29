@@ -23,17 +23,10 @@ const playerAnimations = {
   }
 };
 
-const SIDE = { left: true, right: false };
-
-const initialJumps = 2;
-
-class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, name, playerId, controls) {
-    super(scene, x, y, "player");
-    this.controls = controls;
+class Player extends BasePlayer {
+  constructor(scene, x, y, name, playerId) {
+    super(scene, x, y, name, playerId);
     this.remoteState = {};
-    this.setOrigin(0.5, 0.5);
-    this.playerId = playerId;
     this.createAnims(scene);
     this.scaleX = 1;
     this.scaleY = 1;
@@ -46,15 +39,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       if (!this.canAnimate) this.canAnimate = true;
     });
     this.localPlayer = false;
-    this.jumps = initialJumps;
-    this.side = SIDE.right;
     this.chatMessage = new ChatMessage(this.scene, this, "");
   }
 
   setName(name) {
-    this.name.text = name
+    this.name.text = name;
   }
-
 
   createAnims(scene) {
     scene.anims.create({
@@ -89,7 +79,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
-
   updatePlayerName() {
     this.name.setPosition(
       this.body.position.x,
@@ -98,8 +87,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateChatMessage() {
-    if (this.chatMessage != null)
-      this.chatMessage.update();
+    if (this.chatMessage != null) this.chatMessage.update();
   }
 
   setMessage(text) {
@@ -116,67 +104,13 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.localPlayer = true;
   }
 
-  update(input) {
-    if (!input || input == null || input == undefined) return;
-    var grounded = this.body.touching.down;
-    var velocityX = 0;
-    var left = () => (velocityX -= 300);
-    var right = () => (velocityX += 300);
-
-    if (!input.didJump) {
-      this.canJump = true;
-    }
-    if (!grounded) {
-      velocityX = this.body.velocity.x;
-    }
-    if (input.left && grounded) {
-      left();
-      this.setAnim("walk");
-      this.side = SIDE.left;
-    }
-    if (input.right && grounded) {
-      right();
-      this.setAnim("walk");
-      this.side = SIDE.right;
-    }
-    if (this.jumps > 0 && input.up && input.didJump && this.canJump) {
-      if (input.left && !grounded) {
-        velocityX = -300;
-        this.side = SIDE.left;
-      }
-      if (input.right && !grounded) {
-        velocityX = 300;
-        this.side = SIDE.right;
-      }
-      this.body.setVelocityY(-500);
-      this.jumps -= 1;
-      this.setAnim("jump");
-      this.canJump = false;
-    }
-    if (grounded && !input.didJump) {
-      this.restartJumps();
-    }
-    if (!input.left && !input.right && grounded) this.setAnim("idle");
-    this.body.setVelocityX(velocityX);
-    if (grounded && input.attack1 && !this.onAction) {
-      //attack
-      this.setAnim("attack1");
-      this.onAction = true;
-      setTimeout(() => {
-        this.onAction = false;
-      }, 500 /*this.attacks.attack1.duration*/);
-    }
+  onFinishMovementUpdate() {
     this.updatePlayerName();
     this.updateChatMessage();
   }
 
   setAnim(anim) {
-    
     if (!this.onAction && playerAnimations[anim]) playerAnimations[anim](this);
-  }
-
-  restartJumps() {
-    this.jumps = initialJumps;
   }
 
   updateRemoteState(state) {
@@ -184,15 +118,16 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   validatePosition() {
-
-    if (this.x != this.remoteState.x ||
-      Math.abs(this.y.toFixed(1) - this.remoteState.y) > 10) {
-        this.x = this.remoteState.x
-        this.y = this.remoteState.y
-      }
+    if (
+      this.x != this.remoteState.x ||
+      Math.abs(this.y.toFixed(1) - this.remoteState.y) > 10
+    ) {
+      this.x = this.remoteState.x;
+      this.y = this.remoteState.y;
+    }
   }
 
-  validateState() {    
+  validateState() {
     const state = this.remoteState;
     this.updateChatMessage();
     if (state == null || !state || state == undefined) return;
@@ -202,7 +137,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.onAction = state.onAction;
     this.setAnim(state.anim);
     this.updatePlayerName();
-    this.validatePosition()
+    this.validatePosition();
   }
 
   validateLocalState() {
@@ -215,6 +150,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     return {
       x: this.x,
       y: this.y
-    }
+    };
   }
 }

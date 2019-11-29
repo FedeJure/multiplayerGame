@@ -15,7 +15,7 @@ class MainScene extends Phaser.Scene {
   }
 
   displayPlayers(playerInfo, sprite) {
-    const player = new Player(this, playerInfo.x, playerInfo.y, playerInfo.name, playerInfo.playerId,controls);
+    const player = new Player(this, playerInfo.x, playerInfo.y, playerInfo.name, playerInfo.playerId);
     this.physics.add.existing(player); 
     this.add.existing(player);
     player.setDrag(100);

@@ -47,7 +47,7 @@ class GameScene extends Phaser.Scene {
 
   addPlayer(id, x, y, name) {
 
-    const player = new HeadlessPlayer(this, x, y, name, id, this.controls);
+    const player = new HeadlessPlayer(this, x, y, name, id);
     this.physics.add.existing(player);
     this.add.existing(player);
     player.setDrag(100);
