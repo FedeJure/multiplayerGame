@@ -15,7 +15,7 @@ class MainScene extends Phaser.Scene {
   }
 
   displayPlayers(playerInfo, sprite) {
-    const player = new Player(this, playerInfo.x, playerInfo.y, playerInfo.name, playerInfo.playerId,this.controls);
+    const player = new Player(this, playerInfo.x, playerInfo.y, playerInfo.name, playerInfo.playerId,controls);
     this.physics.add.existing(player); 
     this.add.existing(player);
     player.setDrag(100);
@@ -33,17 +33,7 @@ class MainScene extends Phaser.Scene {
     });
     this.load.image("background", "./assets/background.png");
     this.load.image("ground", "./assets/simple_platform.png");
-    this.controls = this.input.keyboard.addKeys({
-      up: "W",
-      down: "S",
-      left: "A",
-      right: "D",
-      jump: "SPACE",
-      attack1: "U",
-      attack2: "I",
-      attack3: "O",
-      lag: "L"
-    });
+    initControls(this.input);
   }
 
   create() {
@@ -80,9 +70,6 @@ class MainScene extends Phaser.Scene {
         players[playerState.playerId].updateRemoteState(playerState);
       });
     })
-
-    this.cursors = this.input.keyboard.createCursorKeys();
-
     this.createTerrain();
     this.initPlatforms();
     this.chat = new Chat(this)
@@ -93,11 +80,11 @@ class MainScene extends Phaser.Scene {
       return;
     }
     const input = {
-      left : this.controls.left.isDown,
-      right : this.controls.right.isDown,
-      up : this.controls.jump.isDown,
-      didJump : !savedInput.up && this.controls.jump.isDown,
-      attack1 : this.controls.attack1.isDown,
+      left : controls.left.isDown,
+      right : controls.right.isDown,
+      up : controls.jump.isDown,
+      didJump : !savedInput.up && controls.jump.isDown,
+      attack1 : controls.attack1.isDown,
     }
     localPlayer.update(input);
     // if (
@@ -115,7 +102,7 @@ class MainScene extends Phaser.Scene {
         players[playerId].validateState(); 
       }
     })
-    if (this.controls.lag.isDown) {
+    if (controls.lag.isDown) {
       localPlayer.validatePosition();
     }
   }
