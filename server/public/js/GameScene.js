@@ -86,7 +86,8 @@ class MainScene extends Phaser.Scene {
       didJump : !savedInput.up && controls.jump.isDown,
       attack1 : controls.attack1.isDown,
     }
-    localPlayer.update(input);
+    localPlayer.input = input;
+    localPlayer.update();
     // if (
     //   savedInput.left !== input.left ||
     //   savedInput.right !== input.right ||

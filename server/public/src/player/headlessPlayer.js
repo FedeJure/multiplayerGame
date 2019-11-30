@@ -11,8 +11,11 @@ class HeadlessPlayer extends BasePlayer {
   }
 
   restartJumps() {
-    this.jumps = initialJumps;
+    this.jumps = this.initialJumps;
   }
+
+
+
 
   getRepresentation() {
     return {

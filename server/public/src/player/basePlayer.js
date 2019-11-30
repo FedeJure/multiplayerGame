@@ -26,10 +26,11 @@ class BasePlayer extends Phaser.Physics.Arcade.Sprite {
     super.destroy();
   }
 
-  update(input) {
+  update() {
+    const input = this.input;
     if (!input || input == null || input == undefined) return;
     var grounded = this.body.touching.down;
-    this.auxVelocityX = this.body.velocity.x;
+    this.auxVelocityX = 0;
     var left = () => {
       this.auxVelocityX -= this.runVelocity;
       this.side = SIDE.left;
@@ -68,11 +69,10 @@ class BasePlayer extends Phaser.Physics.Arcade.Sprite {
       this.canJump = false;
     }
     if (grounded && !input.didJump) {
-      this.restartJumps();
+      this.jumps = this.initialJumps;
     }
     if (!input.left && !input.right && grounded) this.setAnim("idle");
     this.body.setVelocityX(this.auxVelocityX);
-    console.log(this.auxVelocityX,grounded)
     if (grounded && input.attack1 && !this.onAction) {
       //attack
       this.setAnim("attack1");
@@ -84,11 +84,11 @@ class BasePlayer extends Phaser.Physics.Arcade.Sprite {
     this.onFinishMovementUpdate();
   }
 
-  setAnim(anim) {
-    this.anim = anim;
+  onFinishMovementUpdate() {
+    //Replace in derivates classes
   }
 
-  restartJumps() {
-    this.jumps = this.initialJumps;
+  setAnim(anim) {
+    this.anim = anim;
   }
 }
