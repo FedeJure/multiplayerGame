@@ -26,13 +26,11 @@ class GameScene extends Phaser.Scene {
         delete players[socket.id];
         io.emit("disconnect", socket.id);
       });
-      socket.on("playerInput", ({input, state}) => {
+      socket.on("playerInput", ({ input, state }) => {
         players[socket.id].input = input;
         players[socket.id].lastState = state;
       });
     });
-    
-
   }
 
   update(time, delta) {
@@ -41,12 +39,11 @@ class GameScene extends Phaser.Scene {
       const player = players[key];
       player.update();
       toSend[key] = player.getRepresentation();
-    })
+    });
     io.emit("playersUpdate", toSend);
   }
 
   addPlayer(id, x, y, name) {
-
     const player = new HeadlessPlayer(this, x, y, name, id);
     this.physics.add.existing(player);
     this.add.existing(player);
@@ -69,7 +66,7 @@ class GameScene extends Phaser.Scene {
         ).content;
       }
     };
-    window.URL.revokeObjectURL = objectURL => { };
+    window.URL.revokeObjectURL = objectURL => {};
   }
 
   createTerrain() {

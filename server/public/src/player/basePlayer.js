@@ -29,7 +29,7 @@ class BasePlayer extends Phaser.Physics.Arcade.Sprite {
   update(input) {
     if (!input || input == null || input == undefined) return;
     var grounded = this.body.touching.down;
-    this.auxVelocityX = 0;
+    this.auxVelocityX = this.body.velocity.x;
     var left = () => {
       this.auxVelocityX -= this.runVelocity;
       this.side = SIDE.left;
@@ -72,6 +72,7 @@ class BasePlayer extends Phaser.Physics.Arcade.Sprite {
     }
     if (!input.left && !input.right && grounded) this.setAnim("idle");
     this.body.setVelocityX(this.auxVelocityX);
+    console.log(this.auxVelocityX,grounded)
     if (grounded && input.attack1 && !this.onAction) {
       //attack
       this.setAnim("attack1");
