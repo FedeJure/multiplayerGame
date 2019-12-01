@@ -40,6 +40,7 @@ class Player extends BasePlayer {
     });
     this.localPlayer = false;
     this.chatMessage = new ChatMessage(this.scene, this, "");
+    scene.events.on("update",(time,delta) => this.update());
   }
 
   setName(name) {
@@ -106,7 +107,6 @@ class Player extends BasePlayer {
 
   onFinishMovementUpdate() {
     this.updatePlayerName();
-    this.updateChatMessage();
   }
 
   setAnim(anim) {
@@ -129,7 +129,6 @@ class Player extends BasePlayer {
 
   validateState() {
     const state = this.remoteState;
-    this.updateChatMessage();
     if (state == null || !state || state == undefined) return;
     this.setVelocityX(state.velocityX);
     this.setVelocityY(state.velocityY);

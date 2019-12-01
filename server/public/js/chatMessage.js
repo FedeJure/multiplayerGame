@@ -25,6 +25,8 @@ class ChatMessage extends Phaser.GameObjects.Container {
     this.message = message;
     this.timeoutHandle = null;
     this.scene = scene;
+
+    scene.events.on("update",(time,delta) => this.update());
   }
 
   update() {

@@ -73,6 +73,8 @@ class MainScene extends Phaser.Scene {
     this.createTerrain();
     this.initPlatforms();
     this.chat = new Chat(this)
+
+    
   }
 
   update() {
@@ -87,7 +89,7 @@ class MainScene extends Phaser.Scene {
       attack1 : controls.attack1.isDown,
     }
     localPlayer.input = input;
-    localPlayer.update();
+    //localPlayer.update();
     // if (
     //   savedInput.left !== input.left ||
     //   savedInput.right !== input.right ||
@@ -103,6 +105,8 @@ class MainScene extends Phaser.Scene {
         players[playerId].validateState(); 
       }
     })
+
+    if (!Object.values(input).includes(true)) localPlayer.validatePosition();
     if (controls.lag.isDown) {
       localPlayer.validatePosition();
     }
