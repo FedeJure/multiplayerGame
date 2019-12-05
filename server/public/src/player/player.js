@@ -25,23 +25,55 @@ const playerAnimations = {
 
 class Player extends BasePlayer {
   constructor(scene, x, y, name, playerId) {
-    super(scene, x, y, name, playerId);
+    super(scenem, name, playerId);
+    this.sprite = this.initSprite(scene);
+    this.setDrag(100);
+    this.setAngularDrag(100);
     this.remoteState = {};
     this.createAnims(scene);
     this.scaleX = 1;
     this.scaleY = 1;
     this.anims.play("idle");
-    this.name = scene.add.text(0, 0, name, {
-      fontFamily: '"Roboto Condensed"'
-    });
+
     this.canAnimate = true;
     this.on("animationcomplete", key => {
       if (!this.canAnimate) this.canAnimate = true;
     });
+    this.name = this.initName(scene);
     this.localPlayer = false;
-    this.chatMessage = new ChatMessage(this.scene, this, "");
+    this.chatMessage = this.initChatMessage(scene);
     scene.events.on("update",(time,delta) => this.update());
+
+    scene.initDrawable(this);
+    scene.initPhysicObejct(this);
+    scene.initColliderOnWorld(this);
+
   }
+
+  initSprite(scene) {
+    const sprite = new Phaser.Physics.Arcade.Sprite(scene, 0, 0, "player")
+    sprite.setOrigin(0.5, 0.5);
+    sprite.scaleX = 1;
+    sprite.scaleY = 1;
+    this.add(sprite);
+    scene.initDrawable(sprite);
+    return sprite;
+  }
+
+  initName(scene) {
+    const name = scene.add.text(0, 0, name, {
+      fontFamily: '"Roboto Condensed"'
+    });
+    this.add(name);
+    return name;
+  }
+
+  initChatMessage(scene) {
+    const chatMessage = new ChatMessage(scene, this, "");
+    this.add(chatMessage)
+    scene.initDrawable(chatMessage)
+    return chatMessage
+  } 
 
   setName(name) {
     this.name.text = name;

@@ -1,15 +1,19 @@
 const SIDE = { left: true, right: false };
+const playerConfig = {
+  height: 37,
+  width: 50
+}
 
-class BasePlayer extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, name, playerId) {
-    super(scene, x, y, "player");
-    this.setOrigin(0.5, 0.5);
-    this.playerId = playerId;
+class BasePlayer extends Phaser.GameObjects.Container {
+  constructor(scene, name, playerId) {
+    super(scene, 0, 0, []);
+
     this.nameText = name;
-    this.scaleX = 1;
-    this.scaleY = 1;
+    this.playerId = playerId;
     this.initProperties();
   }
+
+
 
   initProperties() {
     this.initialJumps = 2;
@@ -19,6 +23,8 @@ class BasePlayer extends Phaser.Physics.Arcade.Sprite {
     this.runVelocity = 300;
     this.jumpVelocity = 500;
     this.auxVelocityX = 0;
+    this.height = playerConfig.height;
+    this.width = playerConfig.width;
   }
 
 

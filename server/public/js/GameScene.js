@@ -16,13 +16,20 @@ class MainScene extends Phaser.Scene {
 
   displayPlayers(playerInfo, sprite) {
     const player = new Player(this, playerInfo.x, playerInfo.y, playerInfo.name, playerInfo.playerId);
-    this.physics.add.existing(player); 
-    this.add.existing(player);
-    player.setDrag(100);
-    player.setAngularDrag(100);
-    player.setCollideWorldBounds(false);
-    this.physics.add.collider(player, this.platforms);
     return player;
+  }
+
+  initColliderOnWorld(object) {
+    object.setCollideWorldBounds(false);
+    this.physics.add.collider(object, this.platforms);
+  }
+
+  initPhysicObejct(object) {
+    this.physics.add.existing(object);
+  }
+
+  initDrawable(object) {
+    this.add.existing(object);
   }
 
 
