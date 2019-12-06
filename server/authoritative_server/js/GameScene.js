@@ -44,12 +44,13 @@ class GameScene extends Phaser.Scene {
   }
 
   addPlayer(id, x, y, name) {
-    const player = new HeadlessPlayer(this, x, y, name, id);
+    const player = new HeadlessPlayer(this, name, id);
     this.physics.add.existing(player);
+
     this.add.existing(player);
-    player.setDrag(100);
-    player.setAngularDrag(100);
-    player.setCollideWorldBounds(false);
+    player.body.setDrag(100);
+    player.body.setAngularDrag(100);
+    player.body.setCollideWorldBounds(false);
     this.players.add(player);
     players[id] = player;
     this.physics.add.collider(player, this.platforms);

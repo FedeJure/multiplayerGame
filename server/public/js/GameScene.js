@@ -15,12 +15,12 @@ class MainScene extends Phaser.Scene {
   }
 
   displayPlayers(playerInfo, sprite) {
-    const player = new Player(this, playerInfo.x, playerInfo.y, playerInfo.name, playerInfo.playerId);
+    const player = new Player(this, playerInfo.name, playerInfo.playerId);
     return player;
   }
 
   initColliderOnWorld(object) {
-    object.setCollideWorldBounds(false);
+    object.body.setCollideWorldBounds(false);
     this.physics.add.collider(object, this.platforms);
   }
 

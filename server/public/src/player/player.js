@@ -1,45 +1,45 @@
 const playerAnimations = {
   idle: player => {
-    if (player.anims.currentAnim.key == "idle") return;
-    player.flipX = player.side;
-    player.anims.play("idle");
+    if (player.sprite.anims.currentAnim.key == "idle") return;
+    player.sprite.flipX = player.side;
+    player.sprite.anims.play("idle");
   },
   walk: player => {
-    if (player.anims.currentAnim.key == "walk" && player.flipX == player.side)
+    if (player.sprite.anims.currentAnim.key == "walk" && player.sprite.flipX == player.side)
       return;
-    player.flipX = player.side;
-    player.anims.play("walk");
+    player.sprite.flipX = player.side;
+    player.sprite.anims.play("walk");
   },
   jump: player => {
-    if (player.anims.currentAnim.key == "jump") return;
-    player.flipX = player.side;
-    player.anims.play("jump");
+    if (player.sprite.anims.currentAnim.key == "jump") return;
+    player.sprite.flipX = player.side;
+    player.sprite.anims.play("jump");
   },
   attack1: player => {
-    if (player.anims.currentAnim.key == "attack1") return;
-    player.canAnimate = false;
-    player.flipX = player.side;
-    player.anims.play("attack1");
+    if (player.sprite.anims.currentAnim.key == "attack1") return;
+    player.sprite.canAnimate = false;
+    player.sprite.flipX = player.side;
+    player.sprite.anims.play("attack1");
   }
 };
 
 class Player extends BasePlayer {
-  constructor(scene, x, y, name, playerId) {
-    super(scenem, name, playerId);
+  constructor(scene, name, playerId) {
+    super(scene, name, playerId);
     this.sprite = this.initSprite(scene);
-    this.setDrag(100);
-    this.setAngularDrag(100);
+
     this.remoteState = {};
     this.createAnims(scene);
     this.scaleX = 1;
     this.scaleY = 1;
-    this.anims.play("idle");
+    this.sprite.anims.play("idle");
 
     this.canAnimate = true;
     this.on("animationcomplete", key => {
       if (!this.canAnimate) this.canAnimate = true;
     });
-    this.name = this.initName(scene);
+    this.name = this.initName(scene, name);
+    this.lifebar = this.initLifeBar(scene);
     this.localPlayer = false;
     this.chatMessage = this.initChatMessage(scene);
     scene.events.on("update",(time,delta) => this.update());
@@ -47,6 +47,9 @@ class Player extends BasePlayer {
     scene.initDrawable(this);
     scene.initPhysicObejct(this);
     scene.initColliderOnWorld(this);
+
+    this.body.setDrag(100);
+    this.body.setAngularDrag(100);
 
   }
 
@@ -60,20 +63,34 @@ class Player extends BasePlayer {
     return sprite;
   }
 
-  initName(scene) {
-    const name = scene.add.text(0, 0, name, {
+  initName(scene, nameText) {
+    const name = scene.add.text(0, 0, nameText, {
       fontFamily: '"Roboto Condensed"'
     });
     this.add(name);
+    name.x -= (name.text.length * 3.5);
+    name.y -= playerConfig.height * 1.25;
     return name;
   }
 
   initChatMessage(scene) {
     const chatMessage = new ChatMessage(scene, this, "");
     this.add(chatMessage)
+    chatMessage.x -= playerConfig.width * 0.5;
+    chatMessage.y -= playerConfig.height * 1.5;
     scene.initDrawable(chatMessage)
     return chatMessage
-  } 
+  }
+
+  initLifeBar(scene) {
+    const lifebar = new Phaser.GameObjects.Rectangle(scene, 0, 0, playerConfig.width, 5, "0x59FF00")
+    lifebar.back
+    this.add(lifebar);
+    lifebar.x -= 0;
+    lifebar.y -= playerConfig.height * 0.7;
+    scene.initDrawable(lifebar)
+    return lifebar
+  }
 
   setName(name) {
     this.name.text = name;
@@ -112,17 +129,6 @@ class Player extends BasePlayer {
     });
   }
 
-  updatePlayerName() {
-    this.name.setPosition(
-      this.body.position.x,
-      this.body.position.y - this.body.height * 0.5
-    );
-  }
-
-  updateChatMessage() {
-    if (this.chatMessage != null) this.chatMessage.update();
-  }
-
   setMessage(text) {
     this.chatMessage.setText(text);
   }
@@ -138,7 +144,6 @@ class Player extends BasePlayer {
   }
 
   onFinishMovementUpdate() {
-    this.updatePlayerName();
   }
 
   setAnim(anim) {
@@ -162,19 +167,18 @@ class Player extends BasePlayer {
   validateState() {
     const state = this.remoteState;
     if (state == null || !state || state == undefined) return;
-    this.setVelocityX(state.velocityX);
-    this.setVelocityY(state.velocityY);
-    this.side = state.side;
+    this.body.setVelocityX(state.velocityX);
+    this.body.setVelocityY(state.velocityY);
+    this.sprite.flipX = state.side;
     this.onAction = state.onAction;
     this.setAnim(state.anim);
-    this.updatePlayerName();
     this.validatePosition();
   }
 
   validateLocalState() {
     if (state == null || !state || state == undefined) return;
-    this.setVelocityX(state.velocityX);
-    this.setVelocityY(state.velocityY);
+    this.body.setVelocityX(state.velocityX);
+    this.body.setVelocityY(state.velocityY);
   }
 
   getRepresentation() {

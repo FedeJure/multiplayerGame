@@ -29,13 +29,6 @@ class ChatMessage extends Phaser.GameObjects.Container {
     scene.events.on("update",(time,delta) => this.update());
   }
 
-  update() {
-    this.setPosition(
-      this.parent.body.position.x,
-      this.parent.body.position.y - 13 * (this.box.height / 13) - 15
-    );
-  }
-
   setText(text) {
     window.clearTimeout(this.timeoutHandle);
     this.message.setText(text);

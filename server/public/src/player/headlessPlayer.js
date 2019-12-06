@@ -4,19 +4,6 @@ class HeadlessPlayer extends BasePlayer {
     this.anim = "idle";
   }
 
-  updateState(playerInfo) {
-    this.setRotation(playerInfo.rotation);
-    this.setPosition(playerInfo.x, playerInfo.y);
-    this.updatePlayerName();
-  }
-
-  restartJumps() {
-    this.jumps = this.initialJumps;
-  }
-
-
-
-
   getRepresentation() {
     return {
       x: this.x,

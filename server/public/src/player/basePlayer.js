@@ -1,7 +1,7 @@
 const SIDE = { left: true, right: false };
 const playerConfig = {
   height: 37,
-  width: 50
+  width: 30
 }
 
 class BasePlayer extends Phaser.GameObjects.Container {
