@@ -1,4 +1,5 @@
 const players = {};
+let externalPlayers = null;
 let savedInput = {
   leftKeyPressed: false,
   rightKeyPressed: false,
@@ -41,6 +42,8 @@ class MainScene extends Phaser.Scene {
     this.load.image("background", "./assets/background.png");
     this.load.image("ground", "./assets/simple_platform.png");
     initControls(this.input);
+    externalPlayers = new Phaser.GameObjects.Group(this);
+    this.add.existing(externalPlayers);
   }
 
   create() {
@@ -58,6 +61,7 @@ class MainScene extends Phaser.Scene {
       localPlayer = newPlayer;
       players[newPlayer.playerId] = newPlayer;
       this.chat.addPlayer(newPlayer);
+      initAttackSystem(this)
 
     });
 
@@ -73,6 +77,7 @@ class MainScene extends Phaser.Scene {
           const newPlayer = this.displayPlayers(playerState);
           players[newPlayer.playerId] = newPlayer;
           this.chat.addPlayer(newPlayer);
+          externalPlayers.add(newPlayer);
         }
         players[playerState.playerId].updateRemoteState(playerState);
       });
@@ -80,7 +85,6 @@ class MainScene extends Phaser.Scene {
     this.createTerrain();
     this.initPlatforms();
     this.chat = new Chat(this)
-
     
   }
 

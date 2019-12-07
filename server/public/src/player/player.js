@@ -26,8 +26,11 @@ const playerAnimations = {
 class Player extends BasePlayer {
   constructor(scene, name, playerId) {
     super(scene, name, playerId);
+    scene.initDrawable(this);
+    scene.initPhysicObejct(this);
+    scene.initColliderOnWorld(this);
     this.sprite = this.initSprite(scene);
-
+    this.localPlayer = false;
     this.remoteState = {};
     this.createAnims(scene);
     this.scaleX = 1;
@@ -40,17 +43,21 @@ class Player extends BasePlayer {
     });
     this.name = this.initName(scene, name);
     this.lifebar = this.initLifeBar(scene);
-    this.localPlayer = false;
+    
     this.chatMessage = this.initChatMessage(scene);
     scene.events.on("update",(time,delta) => this.update());
 
-    scene.initDrawable(this);
-    scene.initPhysicObejct(this);
-    scene.initColliderOnWorld(this);
+
 
     this.body.setDrag(100);
     this.body.setAngularDrag(100);
 
+  }
+
+  initAttackSystem(scene) {
+    const attackSystem = new AttackSystem(scene, playerConfig.width, playerConfig.height);
+    scene.initPhysicObejct(attackSystem);
+    this.add(attackSystem);
   }
 
   initSprite(scene) {
@@ -58,8 +65,8 @@ class Player extends BasePlayer {
     sprite.setOrigin(0.5, 0.5);
     sprite.scaleX = 1;
     sprite.scaleY = 1;
-    this.add(sprite);
     scene.initDrawable(sprite);
+    this.add(sprite);
     return sprite;
   }
 
@@ -78,7 +85,6 @@ class Player extends BasePlayer {
     this.add(chatMessage)
     chatMessage.x -= playerConfig.width * 0.5;
     chatMessage.y -= playerConfig.height * 1.5;
-    scene.initDrawable(chatMessage)
     return chatMessage
   }
 
@@ -88,7 +94,6 @@ class Player extends BasePlayer {
     this.add(lifebar);
     lifebar.x -= 0;
     lifebar.y -= playerConfig.height * 0.7;
-    scene.initDrawable(lifebar)
     return lifebar
   }
 
