@@ -10,11 +10,22 @@ class AttackSystem extends Phaser.GameObjects.Rectangle {
     }
 }
 
-const initAttackSystem = (scene) => {
+const initPlayerOverlap = (scene) => {
     scene.physics.add.overlap(localPlayer, externalPlayers, 
         //proccess collide
         (localPlayer, other) => {
-            console.log(localPlayer)
+            if (other.y > localPlayer.y + (playerConfig.height / 2)) {
+                localPlayer.overlaps.down.push(other)                
+            }
+            if (other.y < localPlayer.y - (playerConfig.height / 2)) {
+                localPlayer.overlaps.up.push(other)                
+            }
+            if (other.x > localPlayer.x) {
+                localPlayer.overlaps.right.push(other)                
+            }
+            if (other.x < localPlayer.x) {
+                localPlayer.overlaps.left.push(other)
+            }
         },
         //check, if true, then call proccess collide
         (localPlayer, other) => {

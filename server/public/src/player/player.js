@@ -43,7 +43,7 @@ class Player extends BasePlayer {
     });
     this.name = this.initName(scene, name);
     this.lifebar = this.initLifeBar(scene);
-    
+    //this.attackSystem = this.initAttackSystem(scene);
     this.chatMessage = this.initChatMessage(scene);
     scene.events.on("update",(time,delta) => this.update());
 
@@ -58,6 +58,7 @@ class Player extends BasePlayer {
     const attackSystem = new AttackSystem(scene, playerConfig.width, playerConfig.height);
     scene.initPhysicObejct(attackSystem);
     this.add(attackSystem);
+    return attackSystem;
   }
 
   initSprite(scene) {

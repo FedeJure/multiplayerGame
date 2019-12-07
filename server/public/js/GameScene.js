@@ -61,7 +61,7 @@ class MainScene extends Phaser.Scene {
       localPlayer = newPlayer;
       players[newPlayer.playerId] = newPlayer;
       this.chat.addPlayer(newPlayer);
-      initAttackSystem(this)
+      initPlayerOverlap(this)
 
     });
 

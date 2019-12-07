@@ -25,6 +25,12 @@ class BasePlayer extends Phaser.GameObjects.Container {
     this.auxVelocityX = 0;
     this.height = playerConfig.height;
     this.width = playerConfig.width;
+    this.overlaps = {
+      left: [],
+      right: [],
+      up: [],
+      down: []
+    }
   }
 
 
@@ -33,6 +39,7 @@ class BasePlayer extends Phaser.GameObjects.Container {
   }
 
   update() {
+    console.log(this.overlaps)
     const input = this.input;
     if (!input || input == null || input == undefined) return;
     var grounded = this.body.touching.down;
@@ -87,6 +94,9 @@ class BasePlayer extends Phaser.GameObjects.Container {
         this.onAction = false;
       }, 500 /*this.attacks.attack1.duration*/);
     }
+
+    this.resetOverlaps();
+
     this.onFinishMovementUpdate();
   }
 
@@ -96,5 +106,12 @@ class BasePlayer extends Phaser.GameObjects.Container {
 
   setAnim(anim) {
     this.anim = anim;
+  }
+
+  resetOverlaps() {
+    this.overlaps.down = [];
+    this.overlaps.up = [];
+    this.overlaps.left = [];
+    this.overlaps.right = [];
   }
 }
