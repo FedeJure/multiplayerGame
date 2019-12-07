@@ -1,4 +1,5 @@
 const players = {};
+let externalPlayers = null;
 let savedInput = {
   leftKeyPressed: false,
   rightKeyPressed: false,
@@ -7,23 +8,29 @@ let savedInput = {
 };
 let localPlayer = null;
 let localId = null;
+let socket = null;
 class MainScene extends Phaser.Scene {
 
   constructor() {
     super({ key: "MainGame", active: true });
-
   }
 
   displayPlayers(playerInfo, sprite) {
-    const player = new Player(this, playerInfo.x, playerInfo.y, playerInfo.name, playerInfo.playerId,this.controls);
-    console.log(player)
-    this.physics.add.existing(player); 
-    this.add.existing(player);
-    player.setDrag(100);
-    player.setAngularDrag(100);
-    player.setCollideWorldBounds(false);
-    this.physics.add.collider(player, this.platforms);
+    const player = new Player(this, playerInfo.name, playerInfo.playerId);
     return player;
+  }
+
+  initColliderOnWorld(object) {
+    object.body.setCollideWorldBounds(false);
+    this.physics.add.collider(object, this.platforms);
+  }
+
+  initPhysicObejct(object) {
+    this.physics.add.existing(object);
+  }
+
+  initDrawable(object) {
+    this.add.existing(object);
   }
 
 
@@ -34,58 +41,51 @@ class MainScene extends Phaser.Scene {
     });
     this.load.image("background", "./assets/background.png");
     this.load.image("ground", "./assets/simple_platform.png");
-    this.controls = this.input.keyboard.addKeys({
-      up: "W",
-      down: "S",
-      left: "A",
-      right: "D",
-      jump: "SPACE",
-      attack1: "U",
-      attack2: "I",
-      attack3: "O",
-      lag: "L"
-    });
+    initControls(this.input);
+    externalPlayers = new Phaser.GameObjects.Group(this);
+    this.add.existing(externalPlayers);
   }
 
   create() {
-    this.socket = io({query: {
+    socket = io({query: {
       name: localStorage.getItem("playerName")
     }});
     this.cameras.main.setBackgroundColor("#ccccff");
 
-    this.socket.on("connectionSuccess", playerState => {
+    socket.on("connectionSuccess", playerState => {
       const newPlayer = this.displayPlayers(playerState);
       this.cameras.main.startFollow(newPlayer);
-      this.cameras.main.zoom = 1;
+      this.cameras.main.zoom = 1.1;
       this.cameras.main.setBounds(-10000,-10000,1000000, 10600)
       newPlayer.setIsLocalPlayer();
       localPlayer = newPlayer;
       players[newPlayer.playerId] = newPlayer;
+      this.chat.addPlayer(newPlayer);
+      initAttackSystem(this)
+
     });
 
-    this.socket.on("disconnect", playerId => {
-      Object.keys(players).forEach(id => {
-        if (playerId === players[id].playerId) {
-          players[id].destroy();
-          delete players[id];
-        }
-      });
+    socket.on("disconnect", playerId => {
+      players[playerId].destroy();
+      delete players[playerId];
+      this.chat.removePlayer(playerId);
     });
 
-    this.socket.on("playersUpdate",playersStates => {
+    socket.on("playersUpdate",playersStates => {
       Object.values(playersStates).forEach(playerState => {
         if (players[playerState.playerId] == null) {
           const newPlayer = this.displayPlayers(playerState);
           players[newPlayer.playerId] = newPlayer;
+          this.chat.addPlayer(newPlayer);
+          externalPlayers.add(newPlayer);
         }
-        players[playerState.playerId].remoteState = playerState;
+        players[playerState.playerId].updateRemoteState(playerState);
       });
     })
-
-    this.cursors = this.input.keyboard.createCursorKeys();
-
     this.createTerrain();
     this.initPlatforms();
+    this.chat = new Chat(this)
+    
   }
 
   update() {
@@ -93,32 +93,33 @@ class MainScene extends Phaser.Scene {
       return;
     }
     const input = {
-      left : this.controls.left.isDown,
-      right : this.controls.right.isDown,
-      up : this.controls.jump.isDown,
-      didJump : !savedInput.up && this.controls.jump.isDown,
-      attack1KeyPressed : this.controls.attack1.isDown,
+      left : controls.left.isDown,
+      right : controls.right.isDown,
+      up : controls.jump.isDown,
+      didJump : !savedInput.up && controls.jump.isDown,
+      attack1 : controls.attack1.isDown,
     }
-    localPlayer.update(input);
+    localPlayer.input = input;
+    //localPlayer.update();
+    // if (
+    //   savedInput.left !== input.left ||
+    //   savedInput.right !== input.right ||
+    //   savedInput.up !== input.up ||
+    //   savedInput.didJump !== input.didJump ||
+    //   savedInput.attack1 !== input.attack1
+    // ) {
+      socket.emit("playerInput", {input, state: localPlayer.getRepresentation()});
+      savedInput = {...input};
+    // }
     Object.keys(players).forEach(playerId => {
       if (playerId != localPlayer.playerId) {
-        const player = players[playerId]; 
-        player.validateState();
+        players[playerId].validateState(); 
       }
-
     })
 
-    if (
-      savedInput.left !== input.left ||
-      savedInput.right !== input.right ||
-      savedInput.up !== input.up ||
-      savedInput.attack1 !== input.attack1
-    ) {
-      this.socket.emit("playerInput", input);
-    }
-    savedInput = {...input};
-    if (this.controls.lag.isDown) {
-      localPlayer.validateState()
+    if (!Object.values(input).includes(true)) localPlayer.validatePosition();
+    if (controls.lag.isDown) {
+      localPlayer.validatePosition();
     }
   }
 

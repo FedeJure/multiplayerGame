@@ -7,8 +7,9 @@ const config = {
   physics: {
     default: 'arcade',
     arcade: {
-      debug: false,
-      gravity: { y: 2000 }
+      debug: true,
+      gravity: { y: 2000 },
+      fps: 50
     }
   },
   scene: [MainScene]
