@@ -24,7 +24,9 @@ class AttackSystem  {
         const attack = this.attacks.attack1;
 
         if (input.up) {
-            // Attack to up
+            this.overlaps.up.forEach(target => {
+                target.attackSystem.takePhysicalDamage(attack.damage, Phaser.RIGHT);
+            })
         }
         if (this.owner.side == SIDE.left) {
             this.overlaps.left.forEach(target => {
@@ -32,7 +34,9 @@ class AttackSystem  {
             })
         }
         else if (this.owner.side == SIDE.right) {
-
+            this.overlaps.right.forEach(target => {
+                target.attackSystem.takePhysicalDamage(attack.damage, Phaser.LEFT);
+            })
         }
         this.owner.setAnim("attack1", true);
 
@@ -53,6 +57,9 @@ class AttackSystem  {
 
     takePhysicalDamage(damage, fromDirection) {
         this.life -= damage;
+        if (this.life <= 0) {
+            this.owner.die();
+        }
     }
 }
 

@@ -103,6 +103,11 @@ class BasePlayer extends Phaser.GameObjects.Container {
     this.anim = anim;
   }
 
+  die() {
+    //improve die method
+    this.setVisible(false)
+  }
+
 
 }
 
