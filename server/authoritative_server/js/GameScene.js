@@ -1,4 +1,5 @@
 const players = {};
+let playersGroup = null;
 const chatController = new RemoteChatController();
 class GameScene extends Phaser.Scene {
   constructor() {
@@ -12,7 +13,7 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.players = this.physics.add.group();
+    playersGroup = this.physics.add.group();
     this.createTerrain();
     this.initPlatforms();
     io.on("connection", socket => {
@@ -31,6 +32,7 @@ class GameScene extends Phaser.Scene {
         players[socket.id].lastState = state;
       });
     });
+    this.initPlayersOverlap()
   }
 
   update(time, delta) {
@@ -51,7 +53,7 @@ class GameScene extends Phaser.Scene {
     player.body.setDrag(100);
     player.body.setAngularDrag(100);
     player.body.setCollideWorldBounds(false);
-    this.players.add(player);
+    playersGroup.add(player);
     players[id] = player;
     this.physics.add.collider(player, this.platforms);
   }
@@ -99,4 +101,9 @@ class GameScene extends Phaser.Scene {
       new Phaser.GameObjects.Rectangle(this, 2000, platformY, 10, 1000, 0, 10)
     ]);
   }
+
+  initPlayersOverlap() {
+    this.physics.add.overlap(playersGroup, playersGroup, onPlayerOverlapsOther, null, this);
+  }
+
 }

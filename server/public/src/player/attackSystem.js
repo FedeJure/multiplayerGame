@@ -1,37 +1,58 @@
-
-
-
-class AttackSystem extends Phaser.GameObjects.Rectangle {
-    constructor(owner, scene, width, height) {
-        super(scene, 0, 0, width, height);
+class AttackSystem  {
+    constructor(owner) {
+        this.initialLife = 100;
+        this.life = this.initialLife;
         this.owner = owner;
-        attacksGroup.add(owner);
+        this.attacking = false;
+        this.overlaps = {
+            left: [],
+            right: [],
+            up: [],
+            down: []
+          }
+        this.attacks = {
+            attack1: {
+                duration: 500,
+                damage: 10
+            }
+        }
+    }
 
+    attack1(input) {
+        if (this.attacking) return;
+
+        const attack = this.attacks.attack1;
+
+        if (input.up) {
+            // Attack to up
+        }
+        if (this.owner.side == SIDE.left) {
+            this.overlaps.left.forEach(target => {
+                target.attackSystem.takePhysicalDamage(attack.damage, Phaser.RIGHT);
+            })
+        }
+        else if (this.owner.side == SIDE.right) {
+
+        }
+        this.owner.setAnim("attack1", true);
+
+        this.attacking = true;
+        this.owner.canMove = false;
+        setTimeout(() => {
+            this.attacking = false;
+            this.owner.canMove = true;            
+        }, attack.duration);
+    }
+
+    resetOverlaps() {
+        this.overlaps.down = [];
+        this.overlaps.up = [];
+        this.overlaps.left = [];
+        this.overlaps.right = [];
+    }
+
+    takePhysicalDamage(damage, fromDirection) {
+        this.life -= damage;
     }
 }
 
-const initPlayerOverlap = (scene) => {
-    scene.physics.add.overlap(localPlayer, externalPlayers, 
-        //proccess collide
-        (localPlayer, other) => {
-            if (other.y > localPlayer.y + (playerConfig.height / 2)) {
-                localPlayer.overlaps.down.push(other)                
-            }
-            if (other.y < localPlayer.y - (playerConfig.height / 2)) {
-                localPlayer.overlaps.up.push(other)                
-            }
-            if (other.x > localPlayer.x) {
-                localPlayer.overlaps.right.push(other)                
-            }
-            if (other.x < localPlayer.x) {
-                localPlayer.overlaps.left.push(other)
-            }
-        },
-        //check, if true, then call proccess collide
-        (localPlayer, other) => {
-
-            return true
-        },
-    scene);
-    
-}

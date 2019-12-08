@@ -20,26 +20,20 @@ class BasePlayer extends Phaser.GameObjects.Container {
     this.jumps = this.initialJumps;
     this.side = SIDE.right;
     this.canJump = false
+    this.canMove = true;
     this.runVelocity = 300;
     this.jumpVelocity = 500;
     this.auxVelocityX = 0;
     this.height = playerConfig.height;
     this.width = playerConfig.width;
-    this.overlaps = {
-      left: [],
-      right: [],
-      up: [],
-      down: []
-    }
+    this.attackSystem = new AttackSystem(this);
   }
-
 
   destroy() {
     super.destroy();
   }
 
   update() {
-    console.log(this.overlaps)
     const input = this.input;
     if (!input || input == null || input == undefined) return;
     var grounded = this.body.touching.down;
@@ -53,49 +47,50 @@ class BasePlayer extends Phaser.GameObjects.Container {
       this.side = SIDE.right;
     };
 
-    if (!input.didJump) {
-      this.canJump = true;
-    }
-    if (!grounded) {
-      this.auxVelocityX = this.body.velocity.x;
-    }
-    if (input.left && grounded) {
-      left();
-      this.setAnim("walk");
-    }
-    if (input.right && grounded) {
-      right();
-      this.setAnim("walk");
-    }
-    if (this.jumps > 0 && input.up && input.didJump && this.canJump) {
-      if (input.left && !grounded) {
-        this.auxVelocityX = 0;
-        left();
-      }
-      if (input.right && !grounded) {
-        this.auxVelocityX = 0;
-        right();
-      }
-      this.body.setVelocityY(-this.jumpVelocity);
-      this.jumps -= 1;
-      this.setAnim("jump");
-      this.canJump = false;
-    }
-    if (grounded && !input.didJump) {
-      this.jumps = this.initialJumps;
-    }
-    if (!input.left && !input.right && grounded) this.setAnim("idle");
-    this.body.setVelocityX(this.auxVelocityX);
-    if (grounded && input.attack1 && !this.onAction) {
-      //attack
-      this.setAnim("attack1");
-      this.onAction = true;
-      setTimeout(() => {
-        this.onAction = false;
-      }, 500 /*this.attacks.attack1.duration*/);
+    //ATTACKS
+    if (input.attack1) {
+      this.attackSystem.attack1(input);
     }
 
-    this.resetOverlaps();
+    //MOVEMENT
+    if (this.canMove) {
+      if (!input.didJump) {
+        this.canJump = true;
+      }
+      if (!grounded) {
+        this.auxVelocityX = this.body.velocity.x;
+      }
+      if (input.left && grounded) {
+        left();
+        this.setAnim("walk");
+      }
+      if (input.right && grounded) {
+        right();
+        this.setAnim("walk");
+      }
+      if (this.jumps > 0 && input.jump && input.didJump && this.canJump) {
+        if (input.left && !grounded) {
+          this.auxVelocityX = 0;
+          left();
+        }
+        if (input.right && !grounded) {
+          this.auxVelocityX = 0;
+          right();
+        }
+        this.body.setVelocityY(-this.jumpVelocity);
+        this.jumps -= 1;
+        this.setAnim("jump");
+        this.canJump = false;
+      }
+      if (grounded && !input.didJump) {
+        this.jumps = this.initialJumps;
+      }
+      if (!input.left && !input.right && grounded) this.setAnim("idle");
+      this.body.setVelocityX(this.auxVelocityX);  
+    }
+
+
+    this.attackSystem.resetOverlaps();
 
     this.onFinishMovementUpdate();
   }
@@ -108,10 +103,21 @@ class BasePlayer extends Phaser.GameObjects.Container {
     this.anim = anim;
   }
 
-  resetOverlaps() {
-    this.overlaps.down = [];
-    this.overlaps.up = [];
-    this.overlaps.left = [];
-    this.overlaps.right = [];
-  }
+
 }
+
+const onPlayerOverlapsOther = (player, other) => {
+    if (other.y > player.y + (playerConfig.height / 2)) {
+      player.attackSystem.overlaps.down.push(other)                
+    }
+    if (other.y < player.y - (playerConfig.height / 2)) {
+      player.attackSystem.overlaps.up.push(other)                
+    }
+    if (other.x > player.x) {
+      player.attackSystem.overlaps.right.push(other)                
+    }
+    if (other.x < player.x) {
+      player.attackSystem.overlaps.left.push(other)
+    }
+};
+

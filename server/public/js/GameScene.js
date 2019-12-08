@@ -61,7 +61,7 @@ class MainScene extends Phaser.Scene {
       localPlayer = newPlayer;
       players[newPlayer.playerId] = newPlayer;
       this.chat.addPlayer(newPlayer);
-      initPlayerOverlap(this)
+      this.initLocalPlayerOverlap()
 
     });
 
@@ -95,7 +95,8 @@ class MainScene extends Phaser.Scene {
     const input = {
       left : controls.left.isDown,
       right : controls.right.isDown,
-      up : controls.jump.isDown,
+      up: controls.up.isDown,
+      jump : controls.jump.isDown,
       didJump : !savedInput.up && controls.jump.isDown,
       attack1 : controls.attack1.isDown,
     }
@@ -104,7 +105,7 @@ class MainScene extends Phaser.Scene {
     // if (
     //   savedInput.left !== input.left ||
     //   savedInput.right !== input.right ||
-    //   savedInput.up !== input.up ||
+    //   savedInput.jump !== input.jump ||
     //   savedInput.didJump !== input.didJump ||
     //   savedInput.attack1 !== input.attack1
     // ) {
@@ -153,5 +154,10 @@ class MainScene extends Phaser.Scene {
       new Phaser.GameObjects.Rectangle(this, 2000, platformY, 10, 1000, 0, 10)
     ]);
   }
+
+  initLocalPlayerOverlap() {
+    this.physics.add.overlap(localPlayer, externalPlayers, onPlayerOverlapsOther, null, this);
+  }
+
 }
 

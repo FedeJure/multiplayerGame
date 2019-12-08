@@ -1,24 +1,25 @@
 const playerAnimations = {
-  idle: player => {
-    if (player.sprite.anims.currentAnim.key == "idle") return;
+  idle: (player, force) => {
+    if (!force && player.sprite.anims.currentAnim.key == "idle") return;
     player.sprite.flipX = player.side;
     player.sprite.anims.play("idle");
   },
-  walk: player => {
-    if (player.sprite.anims.currentAnim.key == "walk" && player.sprite.flipX == player.side)
+  walk: (player, force) => {
+    if (!force && player.sprite.anims.currentAnim.key == "walk" && player.sprite.flipX == player.side)
       return;
     player.sprite.flipX = player.side;
     player.sprite.anims.play("walk");
   },
-  jump: player => {
-    if (player.sprite.anims.currentAnim.key == "jump") return;
+  jump: (player, force) => {
+    if (!force && player.sprite.anims.currentAnim.key == "jump") return;
     player.sprite.flipX = player.side;
     player.sprite.anims.play("jump");
   },
-  attack1: player => {
-    if (player.sprite.anims.currentAnim.key == "attack1") return;
+  attack1: (player, force) => {
+    if (!force && player.sprite.anims.currentAnim.key == "attack1") return;
     player.sprite.canAnimate = false;
     player.sprite.flipX = player.side;
+    console.log("aatack1")
     player.sprite.anims.play("attack1");
   }
 };
@@ -43,22 +44,12 @@ class Player extends BasePlayer {
     });
     this.name = this.initName(scene, name);
     this.lifebar = this.initLifeBar(scene);
-    //this.attackSystem = this.initAttackSystem(scene);
     this.chatMessage = this.initChatMessage(scene);
     scene.events.on("update",(time,delta) => this.update());
-
-
 
     this.body.setDrag(100);
     this.body.setAngularDrag(100);
 
-  }
-
-  initAttackSystem(scene) {
-    const attackSystem = new AttackSystem(scene, playerConfig.width, playerConfig.height);
-    scene.initPhysicObejct(attackSystem);
-    this.add(attackSystem);
-    return attackSystem;
   }
 
   initSprite(scene) {
@@ -152,8 +143,9 @@ class Player extends BasePlayer {
   onFinishMovementUpdate() {
   }
 
-  setAnim(anim) {
-    if (!this.onAction && playerAnimations[anim]) playerAnimations[anim](this);
+  setAnim(anim, force) {
+    if (!playerAnimations[anim]) return;
+    if (force || !this.onAction) playerAnimations[anim](this, force);
   }
 
   updateRemoteState(state) {
@@ -185,6 +177,11 @@ class Player extends BasePlayer {
     if (state == null || !state || state == undefined) return;
     this.body.setVelocityX(state.velocityX);
     this.body.setVelocityY(state.velocityY);
+  }
+
+  update() {
+    super.update();
+    //actualizo barra de vida
   }
 
   getRepresentation() {
