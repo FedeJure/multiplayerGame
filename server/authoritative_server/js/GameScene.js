@@ -1,6 +1,8 @@
 const players = {};
 let playersGroup = null;
 const chatController = new RemoteChatController();
+const globalEventEmitter = new Phaser.Events.EventEmitter();
+
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: "gameScene" });
@@ -27,9 +29,16 @@ class GameScene extends Phaser.Scene {
         delete players[socket.id];
         io.emit("disconnect", socket.id);
       });
+
       socket.on("playerInput", ({ input, state }) => {
         players[socket.id].input = input;
         players[socket.id].lastState = state;
+      });
+
+      globalEventEmitter.addListener("playerDie", playerId => {
+        this.removePlayer(playerId);
+        delete players[playerId];
+        io.emit("disconnect", socket.id);
       });
     });
     this.initPlayersOverlap()

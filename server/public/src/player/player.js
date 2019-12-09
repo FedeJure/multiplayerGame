@@ -37,7 +37,6 @@ class Player extends BasePlayer {
     this.scaleX = 1;
     this.scaleY = 1;
     this.sprite.anims.play("idle");
-
     this.canAnimate = true;
     this.on("animationcomplete", key => {
       if (!this.canAnimate) this.canAnimate = true;
@@ -81,11 +80,8 @@ class Player extends BasePlayer {
   }
 
   initLifeBar(scene) {
-    const lifebar = new Phaser.GameObjects.Rectangle(scene, 0, 0, playerConfig.width, 5, "0x59FF00")
-    lifebar.back
+    const lifebar = new Lifebar(scene, 0, playerConfig.height * 0.7, playerConfig.width, this);
     this.add(lifebar);
-    lifebar.x -= 0;
-    lifebar.y -= playerConfig.height * 0.7;
     return lifebar
   }
 
@@ -169,6 +165,8 @@ class Player extends BasePlayer {
     this.body.setVelocityY(state.velocityY);
     this.sprite.flipX = state.side;
     this.onAction = state.onAction;
+    this.attackSystem.maxLife = state.maxLife;
+    this.lifebar.onChangeLife(state.life);
     this.setAnim(state.anim);
     this.validatePosition();
   }

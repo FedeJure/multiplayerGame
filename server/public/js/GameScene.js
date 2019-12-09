@@ -1,5 +1,5 @@
 const players = {};
-let externalPlayers = null;
+let playersGroup = null;
 let savedInput = {
   leftKeyPressed: false,
   rightKeyPressed: false,
@@ -9,6 +9,7 @@ let savedInput = {
 let localPlayer = null;
 let localId = null;
 let socket = null;
+const globalEventEmitter = new Phaser.Events.EventEmitter();
 class MainScene extends Phaser.Scene {
 
   constructor() {
@@ -42,8 +43,8 @@ class MainScene extends Phaser.Scene {
     this.load.image("background", "./assets/background.png");
     this.load.image("ground", "./assets/simple_platform.png");
     initControls(this.input);
-    externalPlayers = new Phaser.GameObjects.Group(this);
-    this.add.existing(externalPlayers);
+    playersGroup = new Phaser.GameObjects.Group(this);
+    this.add.existing(playersGroup);
   }
 
   create() {
@@ -61,7 +62,7 @@ class MainScene extends Phaser.Scene {
       localPlayer = newPlayer;
       players[newPlayer.playerId] = newPlayer;
       this.chat.addPlayer(newPlayer);
-      this.initLocalPlayerOverlap()
+      this.initPlayersOverlap()
 
     });
 
@@ -77,7 +78,7 @@ class MainScene extends Phaser.Scene {
           const newPlayer = this.displayPlayers(playerState);
           players[newPlayer.playerId] = newPlayer;
           this.chat.addPlayer(newPlayer);
-          externalPlayers.add(newPlayer);
+          playersGroup.add(newPlayer);
         }
         players[playerState.playerId].updateRemoteState(playerState);
       });
@@ -155,9 +156,10 @@ class MainScene extends Phaser.Scene {
     ]);
   }
 
-  initLocalPlayerOverlap() {
-    this.physics.add.overlap(localPlayer, externalPlayers, onPlayerOverlapsOther, null, this);
+  initPlayersOverlap() {
+    this.physics.add.overlap(playersGroup, playersGroup, onPlayerOverlapsOther, null, this);
   }
+
 
 }
 

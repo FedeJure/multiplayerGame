@@ -16,6 +16,7 @@ class BasePlayer extends Phaser.GameObjects.Container {
 
 
   initProperties() {
+    this.eventEmitter = new Phaser.Events.EventEmitter();
     this.initialJumps = 2;
     this.jumps = this.initialJumps;
     this.side = SIDE.right;
@@ -105,7 +106,7 @@ class BasePlayer extends Phaser.GameObjects.Container {
 
   die() {
     //improve die method
-    this.setVisible(false)
+    globalEventEmitter.emit("playerDie", this.playerId);
   }
 
 

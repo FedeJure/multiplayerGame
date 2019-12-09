@@ -1,7 +1,7 @@
 class AttackSystem  {
     constructor(owner) {
-        this.initialLife = 100;
-        this.life = this.initialLife;
+        this.maxLife = 100;
+        this.life = this.maxLife;
         this.owner = owner;
         this.attacking = false;
         this.overlaps = {
@@ -12,7 +12,7 @@ class AttackSystem  {
           }
         this.attacks = {
             attack1: {
-                duration: 500,
+                duration: 250,
                 damage: 10
             }
         }
@@ -57,6 +57,7 @@ class AttackSystem  {
 
     takePhysicalDamage(damage, fromDirection) {
         this.life -= damage;
+        this.owner.eventEmitter.emit("onLifeChange", this.life)
         if (this.life <= 0) {
             this.owner.die();
         }

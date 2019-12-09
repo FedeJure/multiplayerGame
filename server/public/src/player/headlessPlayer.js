@@ -16,7 +16,9 @@ class HeadlessPlayer extends BasePlayer {
       playerId: this.playerId,
       onAction: this.onAction,
       anim: this.anim,
-      name: this.nameText
+      name: this.nameText,
+      life: this.attackSystem.life,
+      maxLife: this.attackSystem.maxLife
     };
   }
 }
