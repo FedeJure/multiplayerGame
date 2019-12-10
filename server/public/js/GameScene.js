@@ -72,6 +72,12 @@ class MainScene extends Phaser.Scene {
       this.chat.removePlayer(playerId);
     });
 
+    socket.on("playerDie", playerId => {
+      if (players[playerId]) {
+        players[playerId].resetPlayer();
+      }
+    });
+
     socket.on("playersUpdate",playersStates => {
       Object.values(playersStates).forEach(playerState => {
         if (players[playerState.playerId] == null) {

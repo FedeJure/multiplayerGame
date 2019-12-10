@@ -19,8 +19,7 @@ class Lifebar extends Phaser.GameObjects.Rectangle {
     onChangeLife(newLife) {
         this.width = (newLife / this.owner.attackSystem.maxLife) * this.maxWidth;
         const percent = this.width / this.maxWidth;
-
-        if (percent < 1) {
+        if (percent <= 1) {
             this.fillColor = greenColor;
         }
         if (percent < 0.75) {

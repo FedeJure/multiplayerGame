@@ -31,14 +31,16 @@ class GameScene extends Phaser.Scene {
       });
 
       socket.on("playerInput", ({ input, state }) => {
-        players[socket.id].input = input;
-        players[socket.id].lastState = state;
+        if (players[socket.id]) {
+          players[socket.id].input = input;
+          players[socket.id].lastState = state;
+        }
+
       });
 
       globalEventEmitter.addListener("playerDie", playerId => {
-        this.removePlayer(playerId);
-        delete players[playerId];
-        io.emit("disconnect", socket.id);
+        //io.emit("playerDie", playerId);
+        players[playerId].resetPlayer();
       });
     });
     this.initPlayersOverlap()

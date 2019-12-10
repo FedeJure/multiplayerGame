@@ -19,7 +19,6 @@ const playerAnimations = {
     if (!force && player.sprite.anims.currentAnim.key == "attack1") return;
     player.sprite.canAnimate = false;
     player.sprite.flipX = player.side;
-    console.log("aatack1")
     player.sprite.anims.play("attack1");
   }
 };
@@ -41,7 +40,7 @@ class Player extends BasePlayer {
     this.on("animationcomplete", key => {
       if (!this.canAnimate) this.canAnimate = true;
     });
-    this.name = this.initName(scene, name);
+    this.name = this.initName(scene, playerId);
     this.lifebar = this.initLifeBar(scene);
     this.chatMessage = this.initChatMessage(scene);
     scene.events.on("update",(time,delta) => this.update());
@@ -179,6 +178,7 @@ class Player extends BasePlayer {
 
   update() {
     super.update();
+    this.lifebar.onChangeLife(this.remoteState.life);
     //actualizo barra de vida
   }
 

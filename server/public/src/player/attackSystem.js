@@ -62,5 +62,9 @@ class AttackSystem  {
             this.owner.die();
         }
     }
+
+    resetLife() {
+        this.life = this.maxLife;
+    }
 }
 

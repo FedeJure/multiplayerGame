@@ -109,6 +109,12 @@ class BasePlayer extends Phaser.GameObjects.Container {
     globalEventEmitter.emit("playerDie", this.playerId);
   }
 
+  resetPlayer() {
+    this.x = 0;
+    this.y = 0;
+    this.attackSystem.resetLife();
+  }
+
 
 }
 
