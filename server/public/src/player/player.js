@@ -40,7 +40,7 @@ class Player extends BasePlayer {
     this.on("animationcomplete", key => {
       if (!this.canAnimate) this.canAnimate = true;
     });
-    this.name = this.initName(scene, playerId);
+    this.name = this.initName(scene, name);
     this.lifebar = this.initLifeBar(scene);
     this.chatMessage = this.initChatMessage(scene);
     scene.events.on("update",(time,delta) => this.update());
