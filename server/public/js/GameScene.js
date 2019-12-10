@@ -125,7 +125,7 @@ class MainScene extends Phaser.Scene {
       }
     })
 
-    if (!Object.values(input).includes(true)) localPlayer.validatePosition();
+    //if (!Object.values(input).includes(true)) localPlayer.validatePosition();
     if (controls.lag.isDown) {
       localPlayer.validatePosition();
     }
