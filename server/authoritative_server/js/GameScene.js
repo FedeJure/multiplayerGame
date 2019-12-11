@@ -1,5 +1,6 @@
 const players = {};
 let playersGroup = null;
+let playersCollidersGroup = null;
 const chatController = new RemoteChatController();
 const globalEventEmitter = new Phaser.Events.EventEmitter();
 
@@ -16,6 +17,8 @@ class GameScene extends Phaser.Scene {
 
   create() {
     playersGroup = this.physics.add.group();
+    playersCollidersGroup = this.physics.add.group();
+    this.physics.add.collider(playersCollidersGroup, playersCollidersGroup);
     this.createTerrain();
     this.initPlatforms();
     io.on("connection", socket => {
@@ -65,6 +68,7 @@ class GameScene extends Phaser.Scene {
     player.body.setAngularDrag(100);
     player.body.setCollideWorldBounds(false);
     playersGroup.add(player);
+    playersCollidersGroup.add(player.collisionableZone)
     players[id] = player;
     this.physics.add.collider(player, this.platforms);
   }

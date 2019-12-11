@@ -10,6 +10,7 @@ class BasePlayer extends Phaser.GameObjects.Container {
 
     this.nameText = name;
     this.playerId = playerId;
+
     this.initProperties();
   }
 
@@ -51,6 +52,7 @@ class BasePlayer extends Phaser.GameObjects.Container {
     //ATTACKS
     if (input.attack1) {
       this.attackSystem.attack1(input);
+      this.auxVelocityX = 0;
     }
 
     //MOVEMENT
@@ -87,10 +89,9 @@ class BasePlayer extends Phaser.GameObjects.Container {
         this.jumps = this.initialJumps;
       }
       if (!input.left && !input.right && grounded) this.setAnim("idle");
-      this.body.setVelocityX(this.auxVelocityX);  
     }
-
-
+    
+    this.body.setVelocityX(this.auxVelocityX);  
     this.attackSystem.resetOverlaps();
 
     this.onFinishMovementUpdate();
