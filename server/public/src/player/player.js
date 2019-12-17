@@ -45,8 +45,6 @@ class Player extends BasePlayer {
     this.chatMessage = this.initChatMessage(scene);
     scene.events.on("update",(time,delta) => this.update());
 
-    this.collisionableZone = new ColisionPlayerZone(scene, this);
-    this.add(this.collisionableZone);
     
     this.body.setDrag(100);
     this.body.setAngularDrag(100);

@@ -18,7 +18,7 @@ class AttackSystem  {
         }
     }
 
-    attack1(input) {
+    attack1(input, onStart, onFinish) {
         if (this.attacking) return;
 
         const attack = this.attacks.attack1;
@@ -38,13 +38,11 @@ class AttackSystem  {
                 target.attackSystem.takePhysicalDamage(attack.damage, Phaser.LEFT);
             })
         }
-        this.owner.setAnim("attack1", true);
-
         this.attacking = true;
-        this.owner.canMove = false;
+        onStart();
         setTimeout(() => {
             this.attacking = false;
-            this.owner.canMove = true;            
+            onFinish();         
         }, attack.duration);
     }
 

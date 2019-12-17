@@ -5,6 +5,5 @@ class ColisionPlayerZone extends Phaser.GameObjects.Rectangle {
         this.y = owner.y;
         scene.physics.add.existing(this)
         this.body.setAllowGravity(false);
-        console.log(this)
     }
 }
