@@ -1,6 +1,5 @@
 const players = {};
 let playersGroup = null;
-let playersCollidersGroup = null;
 let savedInput = {
   leftKeyPressed: false,
   rightKeyPressed: false,
@@ -45,7 +44,6 @@ class MainScene extends Phaser.Scene {
     this.load.image("ground", "./assets/simple_platform.png");
     initControls(this.input);
     playersGroup = this.physics.add.group();
-    playersCollidersGroup = this.physics.add.group();
   }
 
   create() {
@@ -53,8 +51,6 @@ class MainScene extends Phaser.Scene {
       name: localStorage.getItem("playerName")
     }});
     this.cameras.main.setBackgroundColor("#ccccff");
-
-    this.physics.add.collider(playersCollidersGroup, playersCollidersGroup);
 
     socket.on("connectionSuccess", playerState => {
       const newPlayer = this.displayPlayers(playerState);
@@ -66,7 +62,6 @@ class MainScene extends Phaser.Scene {
       players[newPlayer.playerId] = newPlayer;
       this.chat.addPlayer(newPlayer);
       this.initPlayersOverlap()
-
     });
 
     socket.on("disconnect", playerId => {
@@ -88,7 +83,6 @@ class MainScene extends Phaser.Scene {
           players[newPlayer.playerId] = newPlayer;
           this.chat.addPlayer(newPlayer);
           playersGroup.add(newPlayer);
-          playersCollidersGroup.add(newPlayer.collisionableZone);
         }
         players[playerState.playerId].updateRemoteState(playerState);
       });

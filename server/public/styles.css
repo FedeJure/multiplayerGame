@@ -2,8 +2,12 @@
     display: flex;
     flex-flow: column;
     justify-content: space-between;
-    padding: 10% 30% 10% 30%;
+    margin: 10% 40% 10% 40%;
+    padding: 2% 5%;
     align-content: center;
+    position: absolute;
+    background-color: rgba(0, 155, 253, 0.3);
+    
 }
 
 .home .label {
@@ -127,4 +131,12 @@ body {
 
 .chatContainer .messageContainer {
     height: 90%;
+}
+
+.loginBackground {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+    
 }

@@ -12,11 +12,6 @@ class BasePlayer extends Phaser.GameObjects.Container {
     this.playerId = playerId;
 
     this.initProperties();
-    this.collisionableZone = new ColisionPlayerZone(scene, this);
-    this.add(this.collisionableZone);
-    playersCollidersGroup.add(this.collisionableZone)
-    scene.initPhysicObejct(this.collisionableZone);
-    scene.initColliderOnWorld(this.collisionableZone);
 
   }
 
