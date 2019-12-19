@@ -56,6 +56,15 @@ class GameScene extends Phaser.Scene {
     io.emit("playersUpdate", toSend);
   }
 
+  initColliderOnWorld(object) {
+    object.body.setCollideWorldBounds(false);
+    this.physics.add.collider(object, this.platforms);
+  }
+
+  initPhysicObejct(object) {
+    this.physics.add.existing(object);
+  }
+
   addPlayer(id, x, y, name) {
     const player = new HeadlessPlayer(this, name, id);
     this.physics.add.existing(player);

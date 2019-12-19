@@ -8,8 +8,7 @@ const config = {
     default: 'arcade',
     arcade: {
       debug: false,
-      gravity: { y: 2000 },
-      fps: 50
+      gravity: { y: 2000 }
     }
   },
   scene: [MainScene]

@@ -2,6 +2,8 @@ class HeadlessPlayer extends BasePlayer {
   constructor(scene, x, y, name, playerId) {
     super(scene, x, y, name, playerId);
     this.anim = "idle";
+    //this.collisionableZone = new ColisionPlayerZone(scene, this);
+    //this.add(this.collisionableZone);
   }
 
   getRepresentation() {

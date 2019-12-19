@@ -43,8 +43,7 @@ class MainScene extends Phaser.Scene {
     this.load.image("background", "./assets/background.png");
     this.load.image("ground", "./assets/simple_platform.png");
     initControls(this.input);
-    playersGroup = new Phaser.GameObjects.Group(this);
-    this.add.existing(playersGroup);
+    playersGroup = this.physics.add.group();
   }
 
   create() {
@@ -63,7 +62,6 @@ class MainScene extends Phaser.Scene {
       players[newPlayer.playerId] = newPlayer;
       this.chat.addPlayer(newPlayer);
       this.initPlayersOverlap()
-
     });
 
     socket.on("disconnect", playerId => {

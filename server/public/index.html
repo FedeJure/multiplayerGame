@@ -10,18 +10,18 @@
             localStorage.setItem("playerName", value);
         }
     </script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 
 <body>
+    <img src="./assets/game_background_4.png" class="loginBackground"/>
+    <form class="home">
+        <p class="label"> <b>Ingresa tu nombre: </b></p>
+        <input id="playerNameInput" onchange="saveName()"/>
+        <a class="submit" href="game.html">Jugar!</a>
+        <!--<input type="submit" value="Jugar!" ></input>-->
 
-    <div style="display:'flex'; align-content: 'center'; justify-content: 'center'">
-        <div>
-                <p> Ingresa tu nombre: </p>
-                <input id="playerNameInput" onchange="saveName()"/>
-                <a href="game.html">Jugar!</a>
-        </div>
-
-    </div>
+    </form>
 </body>
 
 </html>

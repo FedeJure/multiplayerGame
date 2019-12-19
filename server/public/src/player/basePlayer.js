@@ -3,14 +3,16 @@ const playerConfig = {
   height: 37,
   width: 30
 }
-
+let playerColisionables = null
 class BasePlayer extends Phaser.GameObjects.Container {
   constructor(scene, name, playerId) {
     super(scene, 0, 0, []);
 
     this.nameText = name;
     this.playerId = playerId;
+
     this.initProperties();
+
   }
 
 
@@ -28,6 +30,7 @@ class BasePlayer extends Phaser.GameObjects.Container {
     this.height = playerConfig.height;
     this.width = playerConfig.width;
     this.attackSystem = new AttackSystem(this);
+    this.inInertia = false;
   }
 
   destroy() {
@@ -50,7 +53,20 @@ class BasePlayer extends Phaser.GameObjects.Container {
 
     //ATTACKS
     if (input.attack1) {
-      this.attackSystem.attack1(input);
+      this.attackSystem.attack1(input, () => {
+        this.inInertia = true;
+        this.canMove = false;   
+        this.setAnim("attack1", true);
+      }, () => {
+        this.inInertia = false;
+        this.canMove = true;   
+        
+      });
+      this.inInertia = true;
+    }
+
+    if(this.inInertia) {
+      this.auxVelocityX = this.body.velocity.x;
     }
 
     //MOVEMENT
@@ -58,9 +74,9 @@ class BasePlayer extends Phaser.GameObjects.Container {
       if (!input.didJump) {
         this.canJump = true;
       }
-      if (!grounded) {
+      /*if (!grounded) {
         this.auxVelocityX = this.body.velocity.x;
-      }
+      }*/
       if (input.left && grounded) {
         left();
         this.setAnim("walk");
@@ -82,15 +98,16 @@ class BasePlayer extends Phaser.GameObjects.Container {
         this.jumps -= 1;
         this.setAnim("jump");
         this.canJump = false;
+        this.inInertia = true;
       }
       if (grounded && !input.didJump) {
         this.jumps = this.initialJumps;
+        this.inInertia = false;
       }
       if (!input.left && !input.right && grounded) this.setAnim("idle");
-      this.body.setVelocityX(this.auxVelocityX);  
     }
-
-
+    
+    this.body.setVelocityX(this.auxVelocityX);  
     this.attackSystem.resetOverlaps();
 
     this.onFinishMovementUpdate();
