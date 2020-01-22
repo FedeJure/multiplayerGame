@@ -20,6 +20,10 @@
     margin: 5%;
 }
 
+.disable-dbl-tap-zoom {
+    touch-action: manipulation;
+  }
+
 .game {
     background-color: lightblue;
     height: 100%;
