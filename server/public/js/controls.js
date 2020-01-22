@@ -19,22 +19,22 @@ const initControls = input => {
     const leftButton = document.getElementById("leftButton");
     const rightButton = document.getElementById("rightButton");
     const jumpButton = document.getElementById("jumpButton");
-    leftButton.onmousedown = ev => {
+    leftButton.ontouchstart = ev => {
       controls.left.isDown = true;
     }
-    leftButton.onmouseup = ev => {
+    leftButton.ontouchend = ev => {
       controls.left.isDown = false;
     }
-    rightButton.onmousedown = ev => {
+    rightButton.ontouchstart = ev => {
       controls.right.isDown = true;
     }
-    rightButton.onmouseup = ev => {
+    rightButton.ontouchend = ev => {
       controls.right.isDown = false;
     }
-    jumpButton.onmousedown = ev => {
+    jumpButton.ontouchstart = ev => {
       controls.jump.isDown = true;
     }
-    jumpButton.onmouseup = ev => {
+    jumpButton.ontouchend = ev => {
       controls.jump.isDown = false;
     }
   } else {

@@ -49,13 +49,12 @@ body {
 
 .buttonContainer {
     display: none;
-    display: flex;
-    justify-content: space-between;
 }
 
 @media only screen and (max-width: 550px) {
     .buttonContainer {
         display: flex;
+        justify-content: space-between;
     }
 
     .gameContainer {
