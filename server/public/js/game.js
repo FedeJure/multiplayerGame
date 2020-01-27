@@ -1,8 +1,8 @@
 const config = {
   type: Phaser.AUTO,
   parent: 'gameZone',
-  width: 800,
-  height: 600,
+  width: window.innerWidth,
+  height: window.innerHeight,
   autoFocus: false,
   physics: {
     default: 'arcade',
@@ -14,5 +14,19 @@ const config = {
   scene: [MainScene]
 };
 
+window.addEventListener('resize', () => {
+  resizeGame();
+});
+
+const resizeGame = () => {
+  game.scale.resize(window.innerWidth, window.innerHeight);
+}
+
 
 const game = new Phaser.Game(config);
+
+$(document).ready(() => {
+  if (typeof window.orientation !== "undefined") {
+    $('*').addClass('isMobile');
+  }
+});

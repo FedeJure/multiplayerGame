@@ -106,14 +106,6 @@ class MainScene extends Phaser.Scene {
       attack1 : controls.attack1.isDown,
     }
     localPlayer.input = input;
-    //localPlayer.update();
-    // if (
-    //   savedInput.left !== input.left ||
-    //   savedInput.right !== input.right ||
-    //   savedInput.jump !== input.jump ||
-    //   savedInput.didJump !== input.didJump ||
-    //   savedInput.attack1 !== input.attack1
-    // ) {
       socket.emit("playerInput", {input, state: localPlayer.getRepresentation()});
       savedInput = {...input};
     // }
@@ -140,8 +132,8 @@ class MainScene extends Phaser.Scene {
   initPlatforms() {
     this.platforms = this.physics.add.staticGroup();
     var platformCount = 7;
-    var platformY = config.height * 0.95;
-    var lastPlatformX = -config.width * 0.5;
+    var platformY = 550;
+    var lastPlatformX = -200;
     for (var i = 0; i < platformCount; i++) {
       this.platforms.create(lastPlatformX, platformY, "ground");
       lastPlatformX += config.width * 0.5;
@@ -149,7 +141,7 @@ class MainScene extends Phaser.Scene {
     this.platforms.addMultiple([
       new Phaser.GameObjects.Rectangle(
         this,
-        -1000,
+        -700,
         platformY,
         10,
         1000,

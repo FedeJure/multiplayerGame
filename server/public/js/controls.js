@@ -15,7 +15,8 @@ const initControls = input => {
     lag: "L"
   });
 
-  if (true) {
+  if (isMobile) {
+    
     const leftButton = document.getElementById("leftButton");
     const rightButton = document.getElementById("rightButton");
     const jumpButton = document.getElementById("jumpButton");

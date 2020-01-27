@@ -55,15 +55,14 @@ body {
     display: none;
 }
 
-@media only screen and (max-width: 550px) {
-    .buttonContainer {
-        display: flex;
-        justify-content: space-between;
-    }
+.isMobile .buttonContainer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
 
-    .gameContainer {
-        flex-flow: column;
-    }
+.isMobile .gameContainer {
+    flex-flow: column;
 }
 
 .chatContainer {
